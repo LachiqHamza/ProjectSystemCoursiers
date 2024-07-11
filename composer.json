@@ -1,0 +1,5 @@
+{
+    "require-dev": {
+        "symfony/symfony": "6.0"
+    }
+}
