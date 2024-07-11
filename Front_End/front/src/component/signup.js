@@ -203,7 +203,7 @@ const SignUp = () => {
           {...tailFormItemLayout}
         >
           <Checkbox>
-            I have read the <a href="">agreement</a>
+            I have read the <Link to="/Agreement">agreement</Link>
           </Checkbox>
         </Form.Item>
         <Form.Item {...tailFormItemLayout}>
