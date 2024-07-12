@@ -3,15 +3,17 @@
 namespace App\Entity;
 
 use App\Repository\ClientRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ClientRepository::class)]
 class Client
 {
     #[ORM\Id]
-    #[ORM\GeneratedValue]
+    #[ORM\GeneratedValue(strategy: "AUTO")]
     #[ORM\Column(type: "integer")]
-    private ?int $id_client = null;
+    private ?int $id;
 
     #[ORM\Column(type: "string", length: 100)]
     private string $name;
@@ -31,7 +33,19 @@ class Client
     #[ORM\Column(type: "string", length: 50)]
     private string $role;
 
-    public function __construct($name, $lastname, $email, $password, $tele, $role)
+    /**
+     * @var Collection<int, Demande>
+     */
+    #[ORM\OneToMany(mappedBy: 'client', targetEntity: Demande::class)]
+    private Collection $demandes;
+
+    /**
+     * @var Collection<int, Facture>
+     */
+    #[ORM\OneToMany(mappedBy: 'id_client', targetEntity: Facture::class)]
+    private Collection $factures;
+
+    public function __construct(string $name, string $lastname, string $email, string $password, string $tele, string $role)
     {
         $this->name = $name;
         $this->lastname = $lastname;
@@ -39,18 +53,15 @@ class Client
         $this->password = $password;
         $this->tele = $tele;
         $this->role = $role;
+        $this->demandes = new ArrayCollection();
+        $this->factures = new ArrayCollection();
     }
 
-    public function getIdClient(): ?int
-    {
-        return $this->id_client;
-    }
+    // Getters and setters...
 
-    public function setIdClient(int $id_client): static
+    public function getId(): ?int
     {
-        $this->id_client = $id_client;
-
-        return $this;
+        return $this->id;
     }
 
     public function getName(): string
@@ -111,5 +122,63 @@ class Client
     public function setRole(string $role): void
     {
         $this->role = $role;
+    }
+
+    /**
+     * @return Collection<int, Demande>
+     */
+    public function getDemandes(): Collection
+    {
+        return $this->demandes;
+    }
+
+    public function addDemande(Demande $demande): static
+    {
+        if (!$this->demandes->contains($demande)) {
+            $this->demandes->add($demande);
+            $demande->setClient($this);
+        }
+
+        return $this;
+    }
+
+    public function removeDemande(Demande $demande): static
+    {
+        if ($this->demandes->removeElement($demande)) {
+            if ($demande->getClient() === $this) {
+                $demande->setClient(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Facture>
+     */
+    public function getFactures(): Collection
+    {
+        return $this->factures;
+    }
+
+    public function addFacture(Facture $facture): static
+    {
+        if (!$this->factures->contains($facture)) {
+            $this->factures->add($facture);
+            $facture->setIdClient($this);
+        }
+
+        return $this;
+    }
+
+    public function removeFacture(Facture $facture): static
+    {
+        if ($this->factures->removeElement($facture)) {
+            if ($facture->getIdClient() === $this) {
+                $facture->setIdClient(null);
+            }
+        }
+
+        return $this;
     }
 }
