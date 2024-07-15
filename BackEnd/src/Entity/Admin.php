@@ -39,9 +39,9 @@ class Admin
 
     #[ORM\Column(type: "string", length: 255, nullable: true)]
     private ?string $date_intergration;
+    #[ORM\Column(type: "float", nullable: true)]
+    private ?float $salaire;
 
-    #[ORM\Column(type: "string", length: 255, nullable: true)]
-    private ?string $salaire;
 
     /**
      * @var Collection<int, Demande>
