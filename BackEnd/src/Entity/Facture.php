@@ -2,39 +2,36 @@
 
 namespace App\Entity;
 
-use App\Repository\FactureRepository;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: FactureRepository::class)]
+#[ORM\Entity]
 class Facture
 {
     #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column]
-    private ?int $id_facture = null;
+    #[ORM\GeneratedValue(strategy: "AUTO")]
+    #[ORM\Column(type: "integer")]
+    private ?int $id_facture;
 
-    #[ORM\Column(nullable: true)]
-    private ?float $montant = null;
+    #[ORM\Column(type: "float", nullable: true)]
+    private ?float $montant;
 
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $description = null;
+    #[ORM\Column(type: "string", length: 255, nullable: true)]
+    private ?string $status;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Client::class, inversedBy="factures")
-     * @ORM\JoinColumn(name="client_id", referencedColumnName="id")
+     * @var Client|null
      */
-    private ?Client $id_client = null;
+    #[ORM\ManyToOne(targetEntity: Client::class)]
+    #[ORM\JoinColumn(name: "id_client", referencedColumnName: "id_client", nullable: true)]
+    private ?Client $client;
 
-    public function __construct(float $montant, ?string $description)
+    public function __construct(?float $montant, ?string $status)
     {
         $this->montant = $montant;
-        $this->description = $description;
+        $this->status = $status;
     }
 
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
+    // Getters and setters...
 
     public function getIdFacture(): ?int
     {
@@ -60,26 +57,26 @@ class Facture
         return $this;
     }
 
-    public function getDescription(): ?string
+    public function getStatus(): ?string
     {
-        return $this->description;
+        return $this->status;
     }
 
-    public function setDescription(?string $description): static
+    public function setStatus(?string $status): static
     {
-        $this->description = $description;
+        $this->status = $status;
 
         return $this;
     }
 
-    public function getIdClient(): ?Client
+    public function getClient(): ?Client
     {
-        return $this->id_client;
+        return $this->client;
     }
 
-    public function setIdClient(?Client $id_client): static
+    public function setClient(?Client $client): static
     {
-        $this->id_client = $id_client;
+        $this->client = $client;
 
         return $this;
     }

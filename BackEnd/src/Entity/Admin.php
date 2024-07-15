@@ -39,14 +39,14 @@ class Admin
 
     #[ORM\Column(type: "string", length: 255, nullable: true)]
     private ?string $date_intergration;
+
     #[ORM\Column(type: "float", nullable: true)]
     private ?float $salaire;
-
 
     /**
      * @var Collection<int, Demande>
      */
-    #[ORM\OneToMany(targetEntity: Demande::class, mappedBy: 'id_admin')]
+    #[ORM\OneToMany(mappedBy: 'id_admin', targetEntity: Demande::class)]
     private Collection $demandes;
 
     public function __construct(
@@ -58,7 +58,7 @@ class Admin
         ?string $role = null,
         ?string $Cin = null,
         ?string $date_intergration = null,
-        ?string $salaire = null
+        ?float $salaire = null
     ) {
         $this->nom = $nom;
         $this->prenom = $prenom;
@@ -182,12 +182,12 @@ class Admin
         return $this;
     }
 
-    public function getSalaire(): ?string
+    public function getSalaire(): ?float
     {
         return $this->salaire;
     }
 
-    public function setSalaire(?string $salaire): static
+    public function setSalaire(?float $salaire): static
     {
         $this->salaire = $salaire;
 

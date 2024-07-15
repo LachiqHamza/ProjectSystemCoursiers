@@ -13,7 +13,7 @@ class Client
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: "AUTO")]
     #[ORM\Column(type: "integer")]
-    private ?int $id;
+    private ?int $id_client;
 
     #[ORM\Column(type: "string", length: 100)]
     private string $name;
@@ -36,7 +36,7 @@ class Client
     /**
      * @var Collection<int, Demande>
      */
-    #[ORM\OneToMany(mappedBy: 'client', targetEntity: Demande::class)]
+    #[ORM\OneToMany(mappedBy: 'id_admin', targetEntity: Demande::class)]
     private Collection $demandes;
 
     /**
@@ -61,7 +61,7 @@ class Client
 
     public function getId(): ?int
     {
-        return $this->id;
+        return $this->id_client;
     }
 
     public function getName(): string
@@ -165,7 +165,7 @@ class Client
     {
         if (!$this->factures->contains($facture)) {
             $this->factures->add($facture);
-            $facture->setIdClient($this);
+            $facture->setClient($this);
         }
 
         return $this;
@@ -174,8 +174,8 @@ class Client
     public function removeFacture(Facture $facture): static
     {
         if ($this->factures->removeElement($facture)) {
-            if ($facture->getIdClient() === $this) {
-                $facture->setIdClient(null);
+            if ($facture->getClient() === $this) {
+                $facture->setClient(null);
             }
         }
 

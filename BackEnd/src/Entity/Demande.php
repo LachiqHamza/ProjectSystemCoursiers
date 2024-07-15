@@ -2,7 +2,6 @@
 
 namespace App\Entity;
 
-use App\Repository\DemandeRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -10,9 +9,32 @@ use Doctrine\ORM\Mapping as ORM;
 class Demande
 {
     #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column]
-    private ?int $id_demande = null;
+    #[ORM\GeneratedValue(strategy: "AUTO")]
+    #[ORM\Column(type: "integer")]
+    private ?int $id_demande;
+    #[ORM\Column(type: "string", length: 255, nullable: true)]
+    private ?string $description;
+
+    /**
+     * @var Client|null
+     */
+    #[ORM\ManyToOne(targetEntity: Client::class)]
+    #[ORM\JoinColumn(name: "id_client", referencedColumnName: "id_client", nullable: true)]
+    private ?Client $client;
+
+    /**
+     * @var Admin|null
+     */
+    #[ORM\ManyToOne(targetEntity: Admin::class)]
+    #[ORM\JoinColumn(name: "id_admin", referencedColumnName: "id_admin", nullable: true)]
+    private ?Admin $id_admin;
+
+    /**
+     * @var Coursiers|null
+     */
+    #[ORM\ManyToOne(targetEntity: Coursiers::class)]
+    #[ORM\JoinColumn(name: "id_coursier", referencedColumnName: "id_coursier", nullable: true)]
+    private ?Coursiers $coursier;
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $adress_source = null;
@@ -20,7 +42,7 @@ class Demande
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $adress_dest = null;
 
-    #[ORM\Column(nullable: true)]
+    #[ORM\Column(type: "float", nullable: true)]
     private ?float $poids = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
@@ -32,39 +54,15 @@ class Demande
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $date_livraison = null;
 
-    /**
-     * @ORM\ManyToOne(targetEntity=Client::class, inversedBy="demandes")
-     * @ORM\JoinColumn(name="id_client", referencedColumnName="id")
-     */
-    private ?Client $client = null;
-
-    /**
-     * @ORM\ManyToOne(targetEntity=Admin::class, inversedBy="demandes")
-     * @ORM\JoinColumn(name="id_admin", referencedColumnName="id_admin")
-     */
-    private ?Admin $id_admin = null;
-
     public function __construct(
-        ?string $adress_source,
-        ?string $adress_dest,
-        ?float $poids,
-        ?\DateTimeInterface $date_demande,
-        ?string $status,
-        ?\DateTimeInterface $date_livraison
+        ?string $date = null,
+        ?string $description = null
     ) {
-        $this->adress_source = $adress_source;
-        $this->adress_dest = $adress_dest;
-        $this->poids = $poids;
-        $this->date_demande = $date_demande;
-        $this->status = $status;
-        $this->date_livraison = $date_livraison;
+        $this->date = $date;
+        $this->description = $description;
     }
 
-    /**
-     * @ORM\ManyToOne(targetEntity=Coursiers::class, inversedBy="demandes")
-     * @ORM\JoinColumn(name="id_coursier", referencedColumnName="id_coursier")
-     */
-    private ?Coursiers $coursier = null;
+    // Getters and setters...
 
     public function getIdDemande(): ?int
     {
@@ -78,16 +76,86 @@ class Demande
         return $this;
     }
 
+    public function getDate(): ?string
+    {
+        return $this->date;
+    }
+
+    public function setDate(?string $date): static
+    {
+        $this->date = $date;
+
+        return $this;
+    }
+
+    public function getDescription(): ?string
+    {
+        return $this->description;
+    }
+
+    public function setDescription(?string $description): static
+    {
+        $this->description = $description;
+
+        return $this;
+    }
+
+    /**
+     * @return Client|null
+     */
+    public function getClient(): ?Client
+    {
+        return $this->client;
+    }
+
+    /**
+     * @param Client|null $client
+     */
+    public function setClient(?Client $client): void
+    {
+        $this->client = $client;
+    }
+
+    /**
+     * @return Admin|null
+     */
+    public function getIdAdmin(): ?Admin
+    {
+        return $this->id_admin;
+    }
+
+    /**
+     * @param Admin|null $id_admin
+     */
+    public function setIdAdmin(?Admin $id_admin): void
+    {
+        $this->id_admin = $id_admin;
+    }
+
+    /**
+     * @return Coursiers|null
+     */
+    public function getCoursier(): ?Coursiers
+    {
+        return $this->coursier;
+    }
+
+    /**
+     * @param Coursiers|null $coursier
+     */
+    public function setCoursier(?Coursiers $coursier): void
+    {
+        $this->coursier = $coursier;
+    }
+
     public function getAdressSource(): ?string
     {
         return $this->adress_source;
     }
 
-    public function setAdressSource(?string $adress_source): static
+    public function setAdressSource(?string $adress_source): void
     {
         $this->adress_source = $adress_source;
-
-        return $this;
     }
 
     public function getAdressDest(): ?string
@@ -95,11 +163,9 @@ class Demande
         return $this->adress_dest;
     }
 
-    public function setAdressDest(?string $adress_dest): static
+    public function setAdressDest(?string $adress_dest): void
     {
         $this->adress_dest = $adress_dest;
-
-        return $this;
     }
 
     public function getPoids(): ?float
@@ -107,11 +173,9 @@ class Demande
         return $this->poids;
     }
 
-    public function setPoids(?float $poids): static
+    public function setPoids(?float $poids): void
     {
         $this->poids = $poids;
-
-        return $this;
     }
 
     public function getDateDemande(): ?\DateTimeInterface
@@ -119,11 +183,9 @@ class Demande
         return $this->date_demande;
     }
 
-    public function setDateDemande(?\DateTimeInterface $date_demande): static
+    public function setDateDemande(?\DateTimeInterface $date_demande): void
     {
         $this->date_demande = $date_demande;
-
-        return $this;
     }
 
     public function getStatus(): ?string
@@ -131,11 +193,9 @@ class Demande
         return $this->status;
     }
 
-    public function setStatus(?string $status): static
+    public function setStatus(?string $status): void
     {
         $this->status = $status;
-
-        return $this;
     }
 
     public function getDateLivraison(): ?\DateTimeInterface
@@ -143,46 +203,8 @@ class Demande
         return $this->date_livraison;
     }
 
-    public function setDateLivraison(?\DateTimeInterface $date_livraison): static
+    public function setDateLivraison(?\DateTimeInterface $date_livraison): void
     {
         $this->date_livraison = $date_livraison;
-
-        return $this;
-    }
-
-    public function getClient(): ?Client
-    {
-        return $this->client;
-    }
-
-    public function setClient(?Client $client): static
-    {
-        $this->client = $client;
-
-        return $this;
-    }
-
-    public function getIdAdmin(): ?Admin
-    {
-        return $this->id_admin;
-    }
-
-    public function setIdAdmin(?Admin $id_admin): static
-    {
-        $this->id_admin = $id_admin;
-
-        return $this;
-    }
-
-    public function getCoursier(): ?Coursiers
-    {
-        return $this->coursier;
-    }
-
-    public function setCoursier(?Coursiers $coursier): static
-    {
-        $this->coursier = $coursier;
-
-        return $this;
     }
 }

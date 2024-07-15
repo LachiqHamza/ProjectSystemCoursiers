@@ -6,7 +6,6 @@ use App\Repository\CoursiersRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use Doctrine\DBAL\Types\Types;
 
 #[ORM\Entity(repositoryClass: CoursiersRepository::class)]
 class Coursiers
@@ -37,7 +36,7 @@ class Coursiers
     #[ORM\Column(type: "string", length: 255, nullable: true)]
     private ?string $Cin;
 
-    #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
+    #[ORM\Column(type: "datetime", nullable: true)]
     private ?\DateTimeInterface $Date_intergration;
 
     #[ORM\Column(type: "float", nullable: true)]
@@ -46,7 +45,7 @@ class Coursiers
     /**
      * @var Collection<int, Demande>
      */
-    #[ORM\OneToMany(mappedBy: 'coursier', targetEntity: Demande::class)]
+    #[ORM\OneToMany(mappedBy: 'id_admin', targetEntity: Demande::class)]
     private Collection $demandes;
 
     public function __construct(
@@ -215,7 +214,6 @@ class Coursiers
     public function removeDemande(Demande $demande): static
     {
         if ($this->demandes->removeElement($demande)) {
-            // set the owning side to null (unless already changed)
             if ($demande->getCoursier() === $this) {
                 $demande->setCoursier(null);
             }
