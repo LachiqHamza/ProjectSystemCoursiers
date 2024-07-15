@@ -44,12 +44,6 @@ class Demande
      */
     private ?Admin $id_admin = null;
 
-    /**
-     * @ORM\ManyToOne(targetEntity=Coursiers::class, inversedBy="demandes")
-     * @ORM\JoinColumn(name="id_coursier", referencedColumnName="id_coursier")
-     */
-    private ?Coursiers $coursier = null;
-
     public function __construct(
         ?string $adress_source,
         ?string $adress_dest,
@@ -65,6 +59,12 @@ class Demande
         $this->status = $status;
         $this->date_livraison = $date_livraison;
     }
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Coursiers::class, inversedBy="demandes")
+     * @ORM\JoinColumn(name="id_coursier", referencedColumnName="id_coursier")
+     */
+    private ?Coursiers $coursier = null;
 
     public function getIdDemande(): ?int
     {
