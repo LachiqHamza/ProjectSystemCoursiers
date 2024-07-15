@@ -79,10 +79,13 @@ class DemandeController extends AbstractController
             $demande->setAdressSource($data['adress_source'] ?? $demande->getAdressSource());
             $demande->setAdressDest($data['adress_dest'] ?? $demande->getAdressDest());
             $demande->setPoids($data['poids'] ?? $demande->getPoids());
+
             // Handle DateTime separately
             $dateDemande = isset($data['date_demande']) ? new \DateTime($data['date_demande']) : $demande->getDateDemande();
             $demande->setDateDemande($dateDemande);
+
             $demande->setStatus($data['status'] ?? $demande->getStatus());
+
             // Handle DateTime separately
             $dateLivraison = isset($data['date_livraison']) ? new \DateTime($data['date_livraison']) : $demande->getDateLivraison();
             $demande->setDateLivraison($dateLivraison);

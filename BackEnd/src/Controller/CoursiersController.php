@@ -62,9 +62,11 @@ class CoursiersController extends AbstractController
         $coursier->setPassword($data['password'] ?? $coursier->getPassword());
         $coursier->setRole($data['role'] ?? $coursier->getRole());
         $coursier->setCin($data['Cin'] ?? $coursier->getCin());
+
         // Handle DateTime separately
         $dateIntegration = isset($data['date_intergration']) ? new \DateTime($data['date_intergration']) : $coursier->getDateIntergration();
         $coursier->setDateIntergration($dateIntegration);
+
         $coursier->setSalaire($data['salaire'] ?? $coursier->getSalaire());
 
         $entityManager->flush();

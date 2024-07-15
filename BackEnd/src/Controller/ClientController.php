@@ -10,6 +10,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\Serializer\Exception\NotEncodableValueException;
 
 class ClientController extends AbstractController
 {
@@ -36,7 +37,14 @@ class ClientController extends AbstractController
     public function createClient(Request $request, EntityManagerInterface $entityManager, SerializerInterface $serializer): JsonResponse
     {
         $data = $request->getContent();
-        $client = $serializer->deserialize($data, Client::class, 'json');
+
+        try {
+            $client = $serializer->deserialize($data, Client::class, 'json');
+        } catch (NotEncodableValueException $e) {
+            return $this->json([
+                'message' => 'Invalid JSON format: ' . $e->getMessage()
+            ], 400);
+        }
 
         $entityManager->persist($client);
         $entityManager->flush();
