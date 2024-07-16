@@ -5,15 +5,25 @@ namespace App\Repository;
 use App\Entity\Demande;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use PhpParser\Node\Scalar\String_;
+use Doctrine\ORM\EntityManagerInterface;
+
+
 
 /**
  * @extends ServiceEntityRepository<Demande>
  */
 class DemandeRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
+
+    private EntityManagerInterface $entityManager;
+
+
+
+    public function __construct(ManagerRegistry $registry, EntityManagerInterface $entityManager)
     {
         parent::__construct($registry, Demande::class);
+        $this->entityManager = $entityManager;
     }
 
     //    /**
@@ -58,10 +68,9 @@ class DemandeRepository extends ServiceEntityRepository
 //******************************************************************************************
 
 //******************************************************************************************
-    public function updateDateLivraison(int $id_demande, \DateTime $dateLivraison): void
+    public function updateDateLivraison(int $id_demande, \DateTimeInterface $dateLivraison): void
     {
-        $entityManager = $this->getEntityManager();
-        $demande = $entityManager->getRepository(Demande::class)->find($id_demande);
+        $demande = $this->entityManager->find(Demande::class, $id_demande);
 
         if (!$demande) {
             throw new \Exception('Demande with ID '.$id_demande.' not found.');
@@ -69,9 +78,8 @@ class DemandeRepository extends ServiceEntityRepository
 
         $demande->setDateLivraison($dateLivraison);
 
-        $entityManager->flush();
+        $this->entityManager->flush();
     }
-
 //********************************************************************************************************
 
 
