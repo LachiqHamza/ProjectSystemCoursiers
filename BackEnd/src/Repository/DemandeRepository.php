@@ -52,6 +52,7 @@ class DemandeRepository extends ServiceEntityRepository
         return $this->createQueryBuilder('d')
             ->andWhere('d.coursier = :coursierId')
             ->andWhere('d.status = :status')
+            ->andWhere('d.date_livraison IS NULL')
             ->setParameter('coursierId', $coursierId)
             ->setParameter('status', 'accepter')
             ->getQuery()
