@@ -58,7 +58,24 @@ class DemandeRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+//******************************************************************************************
 
+//******************************************************************************************
+    public function updateDateLivraison(int $id_demande, \DateTime $dateLivraison): void
+    {
+
+        $entityManager = $this->getEntityManager();
+        $demande = $entityManager->getRepository(Demande::class)->find($id_demande);
+
+        if (!$demande) {
+            throw new \Exception('Demande with ID '.$id_demande.' not found.');
+        }
+
+        $demande->setDateLivraison($dateLivraison);
+
+        $entityManager->flush();
+    }
+//********************************************************************************************************
 
 
 }

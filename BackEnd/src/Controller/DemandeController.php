@@ -13,6 +13,8 @@ use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Serializer\Exception\NotEncodableValueException;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpFoundation\Response;
+
 
 #[Route('/api/demandes')]
 class DemandeController extends AbstractController
@@ -165,5 +167,27 @@ class DemandeController extends AbstractController
 
         return $this->json($responseData);
     }
+//*******************************************************************************************************
+
+//*******************************************************************************************************
+
+    #[Route('/demandes/{id_demande}/updatedatelivraison/{date}', name: 'update_date_livraison', methods: ['PUT'])]
+    public function updateDateLivraison(int $id_demande, string $date, DemandeRepository $demandeRepository): JsonResponse
+    {
+        try {
+            $dateLivraison = \DateTime::createFromFormat('Y-m-d', $date);
+
+            if (!$dateLivraison) {
+                throw new \Exception('Invalid date format. Expected Y-m-d.');
+            }
+
+            $demandeRepository->updateDateLivraison($id_demande, $dateLivraison);
+
+            return $this->json(['message' => 'Date livraison updated successfully.']);
+        } catch (\Exception $e) {
+            return $this->json(['error' =>'An error occurred while updating date livraison.'], Response::HTTP_BAD_REQUEST);
+        }
+    }
+
 //*******************************************************************************************************
 }
