@@ -170,7 +170,6 @@ class DemandeController extends AbstractController
 //*******************************************************************************************************
 
 //*******************************************************************************************************
-
     #[Route('/demandes/{id_demande}/updatedatelivraison/{date}', name: 'update_date_livraison', methods: ['PUT'])]
     public function updateDateLivraison(int $id_demande, string $date, DemandeRepository $demandeRepository): JsonResponse
     {
@@ -185,9 +184,10 @@ class DemandeController extends AbstractController
 
             return $this->json(['message' => 'Date livraison updated successfully.']);
         } catch (\Exception $e) {
-            return $this->json(['error' =>'An error occurred while updating date livraison.'], Response::HTTP_BAD_REQUEST);
+            return $this->json(['error' => $e->getMessage()], Response::HTTP_BAD_REQUEST);
         }
     }
+
 
 //*******************************************************************************************************
 }

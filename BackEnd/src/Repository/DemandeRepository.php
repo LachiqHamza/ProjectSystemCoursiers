@@ -43,10 +43,7 @@ class DemandeRepository extends ServiceEntityRepository
 
 
 //******************************************************************************************
-    /**
-     * @param int $coursierId
-     * @return Demande[]
-     */
+
     public function findAllDemandesByCoursierAndStatusAccepter(int $coursierId): array
     {
         return $this->createQueryBuilder('d')
@@ -63,7 +60,6 @@ class DemandeRepository extends ServiceEntityRepository
 //******************************************************************************************
     public function updateDateLivraison(int $id_demande, \DateTime $dateLivraison): void
     {
-
         $entityManager = $this->getEntityManager();
         $demande = $entityManager->getRepository(Demande::class)->find($id_demande);
 
@@ -75,6 +71,7 @@ class DemandeRepository extends ServiceEntityRepository
 
         $entityManager->flush();
     }
+
 //********************************************************************************************************
 
 
