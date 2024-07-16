@@ -40,4 +40,24 @@ class DemandeRepository extends ServiceEntityRepository
     //            ->getOneOrNullResult()
     //        ;
     //    }
+
+
+//******************************************************************************************
+    /**
+     * @param int $coursierId
+     * @return Demande[]
+     */
+    public function findAllDemandesByCoursierAndStatusAccepter(int $coursierId): array
+    {
+        return $this->createQueryBuilder('d')
+            ->andWhere('d.coursier = :coursierId')
+            ->andWhere('d.status = :status')
+            ->setParameter('coursierId', $coursierId)
+            ->setParameter('status', 'accepter')
+            ->getQuery()
+            ->getResult();
+    }
+
+
+
 }

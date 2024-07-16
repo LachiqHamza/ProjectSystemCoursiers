@@ -114,4 +114,56 @@ class DemandeController extends AbstractController
 
         return $this->json(['message' => 'Demande deleted']);
     }
+
+
+//**********************************************************************************************************
+    #[Route('/demandes/{coursierId}', name: 'demandes_by_coursier', methods: ['GET'])]
+    public function getDemandesByCoursier(int $coursierId, DemandeRepository $demandeRepository): JsonResponse
+    {
+        $demandes = $demandeRepository->findAllDemandesByCoursierAndStatusAccepter($coursierId);
+
+
+        $responseData = [];
+
+        foreach ($demandes as $demande) {
+            $demandeData = [
+                'id_demande' => $demande->getIdDemande(),
+                'description' => $demande->getDescription(),
+                'adress_source' => $demande->getAdressSource(),
+                'adress_dest' => $demande->getAdressDest(),
+                'poids' => $demande->getPoids(),
+                'date_demande' => $demande->getDateDemande(),
+                'status' => $demande->getStatus(),
+                'date_livraison' => $demande->getDateLivraison(),
+            ];
+
+
+            $admin = $demande->getIdAdmin();
+            if ($admin !== null) {
+                $demandeData['admin'] = [
+                    'id_admin' => $admin->getIdAdmin(),
+                    'admin_name' => $admin->getNom(),
+                ];
+            } else {
+                $demandeData['admin'] = null;
+            }
+
+
+            $client = $demande->getClient();
+            if ($client !== null) {
+                $demandeData['client'] = [
+                    'id_client' => $client->getId(),
+                    'client_name' => $client->getName(),
+
+                ];
+            } else {
+                $demandeData['client'] = null;
+            }
+
+            $responseData[] = $demandeData;
+        }
+
+        return $this->json($responseData);
+    }
+//*******************************************************************************************************
 }
