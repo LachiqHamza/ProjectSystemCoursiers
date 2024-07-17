@@ -83,4 +83,17 @@ class DemandeRepository extends ServiceEntityRepository
 //********************************************************************************************************
 
 
+//********************************************************************************************************
+    public function findNweDemandesNullAdminAndCoursier(): array
+    {
+        return $this->createQueryBuilder('d')
+            ->where('d.id_admin IS NULL')
+            ->andWhere('d.coursier IS NULL')
+            ->getQuery()
+            ->getResult();
+    }
+
+//********************************************************************************************************
+
+
 }

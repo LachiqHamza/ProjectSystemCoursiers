@@ -123,7 +123,7 @@ class DemandeController extends AbstractController
     public function getDemandesByCoursier(int $coursierId, DemandeRepository $demandeRepository): JsonResponse
     {
         $demandes = $demandeRepository->findAllDemandesByCoursierAndStatusAccepter($coursierId);
-
+        dump($demandes);
 
         $responseData = [];
 
@@ -145,6 +145,13 @@ class DemandeController extends AbstractController
                 $demandeData['admin'] = [
                     'id_admin' => $admin->getIdAdmin(),
                     'admin_name' => $admin->getNom(),
+                    'admin_prenom' => $admin->getPrenom(),
+                    'admin_telephone' => $admin->getTele(),
+                    'admin_email' => $admin->getEmail(),
+                    'admin_role' => $admin->getRole(),
+                    'admin_cin' => $admin->getCin(),
+                    'admin_integrationdate' => $admin->getDateIntergration(),
+                    'admin_salary' => $admin->getSalaire(),
                 ];
             } else {
                 $demandeData['admin'] = null;
@@ -156,6 +163,10 @@ class DemandeController extends AbstractController
                 $demandeData['client'] = [
                     'id_client' => $client->getId(),
                     'client_name' => $client->getName(),
+                    'client_lastName' => $demande->getClient()->getLastname(),
+                    'client_email' => $demande->getClient()->getEmail(),
+                    'client_phone' => $demande->getClient()->getTele(),
+                    'client_role' => $demande->getClient()->getRole(),
 
                 ];
             } else {
@@ -188,6 +199,43 @@ class DemandeController extends AbstractController
         }
     }
 
+//*******************************************************************************************************
+
+//*******************************************************************************************************
+    #[Route('/finddemandes/newdemandes', name: 'demandes_null_admin_coursier', methods: ['GET'])] #[Route('/finddemandes/newdemandes', name: 'demandes_null_admin_coursier', methods: ['GET'])]
+    public function getDemandesWithNullAdminAndCoursier(): JsonResponse
+    {
+        $demandes = $this->demandeRepository->findNweDemandesNullAdminAndCoursier();
+
+        $responseData = [];
+
+        foreach ($demandes as $demande) {
+            $demandeData = [
+                'id_demande' => $demande->getIdDemande(),
+                'description' => $demande->getDescription(),
+                'client' => $demande->getClient() ? [
+                    'id_client' => $demande->getClient()->getId(),
+                    'client_name' => $demande->getClient()->getName(),
+                    'client_lastName' => $demande->getClient()->getLastname(),
+                    'client_email' => $demande->getClient()->getEmail(),
+                    'client_phone' => $demande->getClient()->getTele(),
+                    'client_role' => $demande->getClient()->getRole(),
+                ] : null,
+                'id_admin' => $demande->getIdAdmin() ? $demande->getIdAdmin()->getIdAdmin() : null,
+                'coursier' => $demande->getCoursier() ? $demande->getCoursier()->getIdCoursier() : null,
+                'adress_source' => $demande->getAdressSource(),
+                'adress_dest' => $demande->getAdressDest(),
+                'poids' => $demande->getPoids(),
+                'date_demande' => $demande->getDateDemande() ? $demande->getDateDemande()->format('Y-m-d') : null,
+                'status' => $demande->getStatus(),
+                'date_livraison' => $demande->getDateLivraison() ? $demande->getDateLivraison()->format('Y-m-d') : null,
+            ];
+
+            $responseData[] = $demandeData;
+        }
+
+        return new JsonResponse($responseData);
+    }
 
 //*******************************************************************************************************
 }
