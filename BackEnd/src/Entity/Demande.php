@@ -12,6 +12,7 @@ class Demande
     #[ORM\GeneratedValue(strategy: "AUTO")]
     #[ORM\Column(type: "integer")]
     private ?int $id_demande;
+
     #[ORM\Column(type: "string", length: 255, nullable: true)]
     private ?string $description;
 
@@ -55,10 +56,10 @@ class Demande
     private ?\DateTimeInterface $date_livraison = null;
 
     public function __construct(
-        ?string $date = null,
+        ?\DateTimeInterface $date_demande = null,
         ?string $description = null
     ) {
-        $this->date = $date;
+        $this->date_demande = $date_demande;
         $this->description = $description;
     }
 
@@ -69,21 +70,9 @@ class Demande
         return $this->id_demande;
     }
 
-    public function setIdDemande(int $id_demande): static
+    public function setIdDemande(int $id_demande): self
     {
         $this->id_demande = $id_demande;
-
-        return $this;
-    }
-
-    public function getDate(): ?string
-    {
-        return $this->date;
-    }
-
-    public function setDate(?string $date): static
-    {
-        $this->date = $date;
 
         return $this;
     }
@@ -93,7 +82,7 @@ class Demande
         return $this->description;
     }
 
-    public function setDescription(?string $description): static
+    public function setDescription(?string $description): self
     {
         $this->description = $description;
 

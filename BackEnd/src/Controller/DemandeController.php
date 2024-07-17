@@ -13,6 +13,8 @@ use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Serializer\Exception\NotEncodableValueException;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpFoundation\Response;
+
 
 #[Route('/api/demandes')]
 class DemandeController extends AbstractController
@@ -114,4 +116,141 @@ class DemandeController extends AbstractController
 
         return $this->json(['message' => 'Demande deleted']);
     }
+
+
+//**********************************************************************************************************
+    #[Route('/demandes/{coursierId}', name: 'demandes_by_coursier', methods: ['GET'])]
+    public function getDemandesByCoursier(int $coursierId, DemandeRepository $demandeRepository): JsonResponse
+    {
+        $demandes = $demandeRepository->findAllDemandesByCoursierAndStatusAccepter($coursierId);
+
+        $responseData = [];
+
+        foreach ($demandes as $demande) {
+            $demandeData = [
+                'id_demande' => $demande->getIdDemande(),
+                'description' => $demande->getDescription(),
+                'adress_source' => $demande->getAdressSource(),
+                'adress_dest' => $demande->getAdressDest(),
+                'poids' => $demande->getPoids(),
+                'date_demande' => $demande->getDateDemande(),
+                'status' => $demande->getStatus(),
+                'date_livraison' => $demande->getDateLivraison(),
+            ];
+
+
+            $admin = $demande->getIdAdmin();
+            if ($admin !== null) {
+                $demandeData['admin'] = [
+                    'id_admin' => $admin->getIdAdmin(),
+                    'admin_name' => $admin->getNom(),
+                    'admin_prenom' => $admin->getPrenom(),
+                    'admin_telephone' => $admin->getTele(),
+                    'admin_email' => $admin->getEmail(),
+                    'admin_role' => $admin->getRole(),
+                    'admin_cin' => $admin->getCin(),
+                    'admin_integrationdate' => $admin->getDateIntergration(),
+                    'admin_salary' => $admin->getSalaire(),
+                ];
+            } else {
+                $demandeData['admin'] = null;
+            }
+
+
+            $client = $demande->getClient();
+            if ($client !== null) {
+                $demandeData['client'] = [
+                    'id_client' => $client->getId(),
+                    'client_name' => $client->getName(),
+                    'client_lastName' => $demande->getClient()->getLastname(),
+                    'client_email' => $demande->getClient()->getEmail(),
+                    'client_phone' => $demande->getClient()->getTele(),
+                    'client_role' => $demande->getClient()->getRole(),
+
+                ];
+            } else {
+                $demandeData['client'] = null;
+            }
+
+            $responseData[] = $demandeData;
+        }
+
+        return $this->json($responseData);
+    }
+//*******************************************************************************************************
+
+//*******************************************************************************************************
+    #[Route('/demandes/{id_demande}/updatedatelivraison/{date}', name: 'update_date_livraison', methods: ['PUT'])]
+    public function updateDateLivraison(int $id_demande, string $date, DemandeRepository $demandeRepository): JsonResponse
+    {
+        try {
+            $dateLivraison = \DateTime::createFromFormat('Y-m-d', $date);
+
+            if (!$dateLivraison) {
+                throw new \Exception('Invalid date format. Expected Y-m-d.');
+            }
+
+            $demandeRepository->updateDateLivraison($id_demande, $dateLivraison);
+
+            return $this->json(['message' => 'Date livraison updated successfully.']);
+        } catch (\Exception $e) {
+            return $this->json(['error' => $e->getMessage()], Response::HTTP_BAD_REQUEST);
+        }
+    }
+
+//*******************************************************************************************************
+
+//*******************************************************************************************************
+    #[Route('/finddemandes/newdemandes', name: 'demandes_null_admin_coursier', methods: ['GET'])]
+    public function getDemandesWithNullAdminAndCoursier(): JsonResponse
+    {
+        $demandes = $this->demandeRepository->findNweDemandesNullAdminAndCoursier();
+
+        $responseData = [];
+
+        foreach ($demandes as $demande) {
+            $demandeData = [
+                'id_demande' => $demande->getIdDemande(),
+                'description' => $demande->getDescription(),
+                'client' => $demande->getClient() ? [
+                    'id_client' => $demande->getClient()->getId(),
+                    'client_name' => $demande->getClient()->getName(),
+                    'client_lastName' => $demande->getClient()->getLastname(),
+                    'client_email' => $demande->getClient()->getEmail(),
+                    'client_phone' => $demande->getClient()->getTele(),
+                    'client_role' => $demande->getClient()->getRole(),
+                ] : null,
+                'id_admin' => $demande->getIdAdmin() ? $demande->getIdAdmin()->getIdAdmin() : null,
+                'coursier' => $demande->getCoursier() ? $demande->getCoursier()->getIdCoursier() : null,
+                'adress_source' => $demande->getAdressSource(),
+                'adress_dest' => $demande->getAdressDest(),
+                'poids' => $demande->getPoids(),
+                'date_demande' => $demande->getDateDemande() ? $demande->getDateDemande()->format('Y-m-d') : null,
+                'status' => $demande->getStatus(),
+                'date_livraison' => $demande->getDateLivraison() ? $demande->getDateLivraison()->format('Y-m-d') : null,
+            ];
+
+            $responseData[] = $demandeData;
+        }
+
+        return new JsonResponse($responseData);
+    }
+
+//*******************************************************************************************************
+
+
+//*******************************************************************************************************
+    #[Route('/finddemandes/newdemandes/count', name: 'demandes_null_admin_coursier_count', methods: ['GET'])]
+    public function countDemandesWithNullAdminAndCoursier(DemandeRepository $demandeRepository): JsonResponse
+    {
+        try {
+            $count = $demandeRepository->countNweDemandesNullAdminAndCoursier();
+
+            return $this->json(['count' => $count]);
+        } catch (\Exception $e) {
+            return $this->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+//*******************************************************************************************************
 }
