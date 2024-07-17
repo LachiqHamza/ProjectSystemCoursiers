@@ -123,7 +123,6 @@ class DemandeController extends AbstractController
     public function getDemandesByCoursier(int $coursierId, DemandeRepository $demandeRepository): JsonResponse
     {
         $demandes = $demandeRepository->findAllDemandesByCoursierAndStatusAccepter($coursierId);
-        dump($demandes);
 
         $responseData = [];
 
@@ -202,7 +201,7 @@ class DemandeController extends AbstractController
 //*******************************************************************************************************
 
 //*******************************************************************************************************
-    #[Route('/finddemandes/newdemandes', name: 'demandes_null_admin_coursier', methods: ['GET'])] #[Route('/finddemandes/newdemandes', name: 'demandes_null_admin_coursier', methods: ['GET'])]
+    #[Route('/finddemandes/newdemandes', name: 'demandes_null_admin_coursier', methods: ['GET'])]
     public function getDemandesWithNullAdminAndCoursier(): JsonResponse
     {
         $demandes = $this->demandeRepository->findNweDemandesNullAdminAndCoursier();
@@ -235,6 +234,22 @@ class DemandeController extends AbstractController
         }
 
         return new JsonResponse($responseData);
+    }
+
+//*******************************************************************************************************
+
+
+//*******************************************************************************************************
+    #[Route('/finddemandes/newdemandes/count', name: 'demandes_null_admin_coursier_count', methods: ['GET'])]
+    public function countDemandesWithNullAdminAndCoursier(DemandeRepository $demandeRepository): JsonResponse
+    {
+        try {
+            $count = $demandeRepository->countNweDemandesNullAdminAndCoursier();
+
+            return $this->json(['count' => $count]);
+        } catch (\Exception $e) {
+            return $this->json(['error' => $e->getMessage()], 500);
+        }
     }
 
 //*******************************************************************************************************

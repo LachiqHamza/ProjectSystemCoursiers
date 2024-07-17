@@ -96,4 +96,18 @@ class DemandeRepository extends ServiceEntityRepository
 //********************************************************************************************************
 
 
+//********************************************************************************************************
+    public function countNweDemandesNullAdminAndCoursier(): int
+    {
+        $query = $this->createQueryBuilder('d')
+            ->select('COUNT(d.id_demande)')
+            ->where('d.id_admin IS NULL')
+            ->andWhere('d.coursier IS NULL')
+            ->getQuery();
+
+        return (int) $query->getSingleScalarResult();
+    }
+//********************************************************************************************************
+
+
 }
