@@ -18,7 +18,53 @@ class ClientController extends AbstractController
     public function getClients(ClientRepository $clientRepository): JsonResponse
     {
         $clients = $clientRepository->findAll();
-        return $this->json($clients);
+
+        $responseData = [];
+
+        foreach ($clients as $client) {
+            $clientData = [
+                'id_client' => $client->getId(),
+                'name' => $client->getName(),
+                'lastname' => $client->getLastname(),
+                'email' => $client->getEmail(),
+                'tele' => $client->getTele(),
+                'role' => $client->getRole(),
+                'password' => $client->getPassword()
+            ];
+
+            /*$demandes = $client->getDemandes();
+            if ($demandes !== null) {
+                $demandesData = [];
+                foreach ($demandes as $demande) {
+                    $demandesData[] = [
+                        'id_demande' => $demande->getIdDemande(),
+                        'description' => $demande->getDescription(),
+                        'adress_source' => $demande->getAdressSource(),
+                        'adress_dest' => $demande->getAdressDest(),
+                        'poids' => $demande->getPoids(),
+                        'date_demande' => $demande->getDateDemande(),
+                        'status' => $demande->getStatus(),
+                        'date_livraison' => $demande->getDateLivraison()
+                    ];
+                }
+                $clientData['demandes'] = $demandesData;
+            } else {
+                $clientData['demandes'] = null;
+            }*/
+
+            /*$factures = $client->getFactures();
+            if ($factures !== null) {
+                $clientData['$factures'] = [
+                    'id_demande' => 'not now'
+                ];
+            } else {
+                $clientData['$factures'] = null;
+            }*/
+
+            $responseData[] = $clientData;
+        }
+
+        return $this->json($responseData);
     }
 
     #[Route('/api/clients/{id}', name: 'get_client', methods: ['GET'])]
