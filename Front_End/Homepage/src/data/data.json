@@ -1,0 +1,165 @@
+{
+  "Header": {
+    "title": "Welcome To The Future Of Delivry",
+    "paragraph": ""
+  },
+  "About": {
+    "paragraph": "At our company, we harness cutting-edge technology to revolutionize the courier and delivery industry. Through advanced tracking systems, real-time updates, and automated logistics, we ensure precision, efficiency, and transparency in every delivery. Our integrated approach not only enhances operational efficiency but also elevates customer experience by providing seamless navigation and secure, timely deliveries. With continuous innovation, we strive to set new standards in reliability and convenience, making every delivery journey smooth and dependable.",
+    "Why": [
+      "Reliable deliveries, always on time",
+      "Advanced real-time tracking and updates",
+      "Responsive, personalized customer service, always available",
+      "Competitive pricing without compromising quality"
+    ],
+    "Why2": [
+      "Extensive network, reaching more destinations efficiently",
+      "Stringent security protocols, ensuring package safety",
+      "Commitment to eco-friendly practices, reducing footprint",
+      "lexible options, customized solutions for you"
+    ]
+  },
+  "Gallery": [
+    {
+      "title": "Project Title",
+      "largeImage": "img/portfolio/01-large.jpg",
+      "smallImage": "img/portfolio/01-small.jpg"
+    },
+    {
+      "title": "Project Title",
+      "largeImage": "img/portfolio/02-large.jpg",
+      "smallImage": "img/portfolio/02-small.jpg"
+    },
+    {
+      "title": "Project Title",
+      "largeImage": "img/portfolio/03-large.jpg",
+      "smallImage": "img/portfolio/03-small.jpg"
+    },
+    {
+      "title": "Project Title",
+      "largeImage": "img/portfolio/04-large.jpg",
+      "smallImage": "img/portfolio/04-small.jpg"
+    },
+    {
+      "title": "Project Title",
+      "largeImage": "img/portfolio/05-large.jpg",
+      "smallImage": "img/portfolio/05-small.jpg"
+    },
+    {
+      "title": "Project Title",
+      "largeImage": "img/portfolio/06-large.jpg",
+      "smallImage": "img/portfolio/06-small.jpg"
+    },
+    {
+      "title": "Project Title",
+      "largeImage": "img/portfolio/07-large.jpg",
+      "smallImage": "img/portfolio/07-small.jpg"
+    },
+    {
+      "title": "Project Title",
+      "largeImage": "img/portfolio/08-large.jpg",
+      "smallImage": "img/portfolio/08-small.jpg"
+    },
+    {
+      "title": "Project Title",
+      "largeImage": "img/portfolio/09-large.jpg",
+      "smallImage": "img/portfolio/09-small.jpg"
+    }
+  ],
+  "Services": [
+    {
+      "icon": "fa fa-truck",
+      "name": "Delivery",
+      "text": "Ensuring prompt and secure transport of packages to designated destinations, prioritizing reliability and safety"
+    },
+    {
+      "icon": "fa fa-cart-arrow-down",
+      "name": "Pick-up",
+      "text": "Swift and efficient collection of items from specified locations, offering convenience and timely retrieval services"
+    },
+    {
+      "icon": "fa fa-cogs",
+      "name": "Transportation",
+      "text": "Handling all aspects of logistics seamlessly, from initial planning to final delivery, ensuring comprehensive management and operational efficiency"
+    }
+  ],
+  "Testimonials": [
+    {
+      "img": "img/testimonials/01.jpg",
+      "text": "Excellent communication throughout the delivery process: Clients appreciate frequent updates and clear communication about their deliveries, which helps them stay informed and reassured",
+      "name": "Hassan Benjelloun"
+    },
+    {
+      "img": "img/testimonials/02.jpg",
+      "text": "\"Always on time with their deliveries, very reliable: Consistent punctuality builds trust and reliability, showing clients that they can depend on your service for timely deliveries\"",
+      "name": "Younes Chaoui"
+    },
+    {
+      "img": "img/testimonials/03.jpg",
+      "text": "\"Impressive attention to detail and careful handling of packages: Clients value the meticulous care taken in handling their packages, ensuring items arrive safely and in good condition.",
+      "name": "Karim El Mansouri"
+    },
+    {
+      "img": "img/testimonials/04.jpg",
+      "text": "\"Their customer service is top-notch, very responsive and helpful: Responsive and helpful customer service leaves a lasting positive impression, as clients feel supported and valued throughout their interactions\"",
+      "name": "Emily Doe"
+    },
+    {
+      "img": "img/testimonials/05.jpg",
+      "text": "\"Love how they offer flexible options tailored to my needs: Flexibility in service offerings demonstrates an understanding of diverse client needs and a commitment to providing personalized solutions\"",
+      "name": "James William Smith"
+    }
+    
+  ],
+  "Team": [
+    {
+      "img": "img/team/01.jpg",
+      "name": "John Doe",
+      "job": "Director"
+    },
+    {
+      "img": "img/team/02.jpg",
+      "name": "Mike Doe",
+      "job": "Senior Designer"
+    },
+    {
+      "img": "img/team/03.jpg",
+      "name": "Jane Doe",
+      "job": "Senior Designer"
+    },
+    {
+      "img": "img/team/04.jpg",
+      "name": "Karen Doe",
+      "job": "Project Manager"
+    }
+  ],
+  "Contact": {
+    "address": "Marrakech,Moroco",
+    "phone": "+212000000000",
+    "email": "info@company.com",
+    "facebook": "fb.com",
+    "twitter": "twitter.com",
+    "youtube": "youtube.com"
+  },
+  "Features": [
+    {
+      "icon": "fa fa-comments-o",
+      "title": "Any time We Help and Assisst Our Clients",
+      "text": "We are committed to exceptional support and assistance. Our goal is to exceed expectations with proactive solutions and reliable service."
+    },
+    {
+      "icon": "fa fa-bullhorn",
+      "title": "We Notify at evry move",
+      "text": "At our organization, we prioritize seamless communication and transparency. We understand the importance of keeping you informed at every step of the way. Whether it's updates on progress, changes in plans, or detailed explanations, we ensure that you are always kept in the loop."
+    },
+    {
+      "icon": "fa fa-group",
+      "title": "Team Work",
+      "text": "Our success thrives on cohesive teamwork. Together, we collaborate, innovate, and achieve excellence, driven by our shared goals and collective efforts. Our team's synergy empowers us to tackle challenges effectively and deliver exceptional results."
+    },
+    {
+      "icon": "fa fa-magic",
+      "title": "Special touch",
+      "text": "We pride ourselves on adding a special touch to courier delivery services. Beyond efficiency and speed, we prioritize personalized care and attention to detail. From secure handling to timely updates and friendly customer interactions, we ensure each delivery embodies reliability and professionalism."
+    }
+  ]
+}

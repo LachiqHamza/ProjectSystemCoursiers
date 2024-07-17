@@ -2,6 +2,7 @@ import React from 'react';
 import { LockOutlined, UserOutlined } from '@ant-design/icons';
 import { Button, Checkbox, Form, Input } from 'antd';
 import { Link } from 'react-router-dom';
+import styles from './login.css'; // Adjust the path as per your file location
 
 const LoginForm = ({ onRegisterClick }) => {
   const onFinish = (values) => {
@@ -9,10 +10,10 @@ const LoginForm = ({ onRegisterClick }) => {
   };
 
   return (
-    <div className="login-form-wrapper">
+    <div className={styles['login-form-wrapper']}>
       <Form
         name="normal_login"
-        className="login-form"
+        className={styles['login-form']}
         initialValues={{
           remember: true,
         }}
@@ -49,13 +50,13 @@ const LoginForm = ({ onRegisterClick }) => {
             <Checkbox>Remember me</Checkbox>
           </Form.Item>
 
-          <a className="login-form-forgot" href="">
+          <a className={styles['login-form-forgot']} href="">
             Forgot password
           </a>
         </Form.Item>
 
         <Form.Item>
-          <Button type="primary" htmlType="submit" className="login-form-button">
+          <Button type="primary" htmlType="submit" className={styles['login-form-button']}>
             Log in
           </Button>
           <p>
