@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Admin;
 use App\Repository\AdminRepository;
 use App\Repository\CoursiersRepository;
+use App\Repository\ClientRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -88,7 +89,7 @@ class AdminController extends AbstractController
 
  //******************************UPDATE ADMIN***************************************************
     #[Route('/api/admins/{id}/update', name: 'update_admin', methods: ['PUT'])]
-    public function updateAdmin(int $id, Request $request, AdminRepository $adminRepository, CoursiersRepository $coursiersRepository , EntityManagerInterface $entityManager): JsonResponse
+    public function updateAdmin(int $id, Request $request, AdminRepository $adminRepository, CoursiersRepository $coursiersRepository, ClientRepository $clientRepository, EntityManagerInterface $entityManager): JsonResponse
     {
         $admin = $entityManager->getRepository(Admin::class)->find($id);
 
@@ -109,6 +110,10 @@ class AdminController extends AbstractController
             $existingCoursier = $coursiersRepository->findOneBy(['email' => $newEmail]);
             if ($existingCoursier) {
                 return $this->json(['message' => 'Email already exists in coursier table'], 409);
+            }
+            $existingCoursier = $clientRepository->findOneBy(['email' => $newEmail]);
+            if ($existingCoursier) {
+                return $this->json(['message' => 'Email already exists in client table'], 409);
             }
         }
 

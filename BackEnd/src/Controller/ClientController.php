@@ -5,8 +5,8 @@ namespace App\Controller;
 use App\Entity\Client;
 use App\Entity\Coursiers;
 use App\Entity\Admin;
-use App\Repository\AdminRepository;
 use App\Repository\CoursiersRepository;
+use App\Repository\AdminRepository;
 use App\Repository\ClientRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -172,7 +172,7 @@ class ClientController extends AbstractController
 
 //***********************************************************************************************
     #[Route('/api/clients/add', name: 'add_client', methods: ['POST'])]
-    public function addClient(Request $request, ClientRepository $clientRepository, EntityManagerInterface $entityManager): JsonResponse
+    public function addClient(Request $request, ClientRepository $clientRepository, AdminRepository $adminRepository, CoursiersRepository $coursiersRepository, EntityManagerInterface $entityManager): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
 
@@ -192,6 +192,14 @@ class ClientController extends AbstractController
         $existingClient = $clientRepository->findOneBy(['email' => $email]);
         if ($existingClient) {
             return $this->json(['message' => 'Email already exists'], 409);
+        }
+        $existingAdmin = $adminRepository->findOneBy(['email' => $email]);
+        if ($existingAdmin) {
+            return $this->json(['message' => 'Email already exists in admin table'], 409);
+        }
+        $existingCoursier = $coursiersRepository->findOneBy(['email' => $email]);
+        if ($existingCoursier) {
+            return $this->json(['message' => 'Email already exists in coursier table'], 409);
         }
 
         // Create a new client
