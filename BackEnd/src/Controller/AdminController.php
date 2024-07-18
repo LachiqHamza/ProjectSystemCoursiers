@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Admin;
 use App\Repository\AdminRepository;
+use App\Repository\CoursiersRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -44,7 +45,7 @@ class AdminController extends AbstractController
         return $this->json($admin, 201);
     }
 
-    #[Route('/api/admins/{id}', name: 'update_admin', methods: ['PUT'])]
+    /*#[Route('/api/admins/{id}', name: 'update_admin', methods: ['PUT'])]
     public function updateAdmin(Request $request, AdminRepository $adminRepository, EntityManagerInterface $entityManager, int $id): JsonResponse
     {
         $admin = $adminRepository->find($id);
@@ -69,7 +70,7 @@ class AdminController extends AbstractController
 
         return $this->json($admin);
     }
-
+*/
     #[Route('/api/admins/{id}', name: 'delete_admin', methods: ['DELETE'])]
     public function deleteAdmin(AdminRepository $adminRepository, EntityManagerInterface $entityManager, int $id): JsonResponse
     {
@@ -84,4 +85,60 @@ class AdminController extends AbstractController
 
         return $this->json(['message' => 'Admin deleted']);
     }
+
+ //******************************UPDATE ADMIN***************************************************
+    #[Route('/api/admins/{id}/update', name: 'update_admin', methods: ['PUT'])]
+    public function updateAdmin(int $id, Request $request, AdminRepository $adminRepository, CoursiersRepository $coursiersRepository , EntityManagerInterface $entityManager): JsonResponse
+    {
+        $admin = $entityManager->getRepository(Admin::class)->find($id);
+
+        if (!$admin) {
+            return $this->json(['message' => 'Admin not found'], 404);
+        }
+
+        $data = json_decode($request->getContent(), true);
+
+        $newEmail = $data['email'] ?? null;
+
+        // Check if the new email already exists, ignoring the current admin's email
+        if ($newEmail && $newEmail !== $admin->getEmail()) {
+            $existingAdmin = $adminRepository->findOneBy(['email' => $newEmail]);
+            if ($existingAdmin) {
+                return $this->json(['message' => 'Email already exists in admin table'], 409);
+            }
+            $existingCoursier = $coursiersRepository->findOneBy(['email' => $newEmail]);
+            if ($existingCoursier) {
+                return $this->json(['message' => 'Email already exists in coursier table'], 409);
+            }
+        }
+
+        // Update the admin entity with new data
+        $admin->setNom($data['nom'] ?? $admin->getNom());
+        $admin->setPrenom($data['prenom'] ?? $admin->getPrenom());
+        $admin->setTele($data['tele'] ?? $admin->getTele());
+        $admin->setEmail($data['email'] ?? $admin->getEmail());
+        $admin->setPassword($data['password'] ?? $admin->getPassword());
+
+        // Persist the updated entity to the database
+        $entityManager->persist($admin);
+        $entityManager->flush();
+
+        // Prepare the response data
+        $adminData = [
+            'id_admin' => $admin->getIdAdmin(),
+            'nom' => $admin->getNom(),
+            'prenom' => $admin->getPrenom(),
+            'tele' => $admin->getTele(),
+            'email' => $admin->getEmail(),
+            'password' => $admin->getPassword(),
+            'role' => $admin->getRole(),
+            'Cin' => $admin->getCin(),
+            'date_intergration' => $admin->getDateIntergration(),
+            'salaire' => $admin->getSalaire(),
+        ];
+
+        return $this->json($adminData);
+    }
+
+    //*********************************************************************************
 }

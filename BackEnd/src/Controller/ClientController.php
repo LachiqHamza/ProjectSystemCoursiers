@@ -181,7 +181,8 @@ class ClientController extends AbstractController
         $email = $data['email'] ?? null;
         $password = $data['password'] ?? null;
         $tele = $data['tele'] ?? null;
-        $role = $data['role'] ?? null;
+        //$role = $data['role'] ?? null;
+        $role = "client";
 
         if (!$name || !$lastname || !$email || !$password || !$tele || !$role) {
             return $this->json(['message' => 'All fields are required'], 400);
