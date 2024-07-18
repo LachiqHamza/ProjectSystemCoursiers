@@ -63,7 +63,7 @@ class Demande
         $this->description = $description;
     }
 
-    // Getters and setters...
+
 
     public function getIdDemande(): ?int
     {

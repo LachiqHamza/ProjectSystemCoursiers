@@ -1,12 +1,33 @@
 import React from 'react';
 import { LockOutlined, UserOutlined } from '@ant-design/icons';
 import { Button, Checkbox, Form, Input } from 'antd';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import styles from './login.css'; // Adjust the path as per your file location
 
 const LoginForm = ({ onRegisterClick }) => {
-  const onFinish = (values) => {
-    console.log('Received values of form: ', values);
+  const navigate = useNavigate();
+
+  const onFinish = async (values) => {
+    try {
+      const response = await axios.post('http://127.0.0.1:8000/api/login', {
+        email: values.username,
+        password: values.password,
+      });
+
+      const user = response.data;
+
+      if (user.role === 'client') {
+        navigate('/client-dashboard');
+      } else if (user.role === 'admin') {
+        navigate('/admin-dashboard');
+      } else if (user.role === 'coursier') {
+        navigate('/coursier-dashboard');
+      }
+    } catch (error) {
+      console.error('Error during login:', error);
+      alert('Invalid email or password');
+    }
   };
 
   return (
