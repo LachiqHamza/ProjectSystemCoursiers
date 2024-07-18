@@ -139,7 +139,7 @@ class ClientController extends AbstractController
                 'tele' => $user->getTele(),
                 'cin' => $user->getCin(),
                 'datedintegration' => $user->getDateIntergration(),
-                'salaire' => $user->getSalaire(),
+                'salaire' => $user->getSalaire()
             ];
             return $this->json($userData);
         }
@@ -158,7 +158,7 @@ class ClientController extends AbstractController
                 'tele' => $user->getTele(),
                 'cin' => $user->getCin(),
                 'datedintegration' => $user->getDateIntergration(),
-                'salaire' => $user->getSalaire(),
+                'salaire' => $user->getSalaire()
             ];
             return $this->json($userData);
         }

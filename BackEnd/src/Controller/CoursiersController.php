@@ -141,4 +141,31 @@ class CoursiersController extends AbstractController
     }
 //*******************************************************************
 
+
+
+//***************************GET ALL COOURCIERS****************************************
+    #[Route('/api/courciers/all', name: 'get_all_courciers', methods: ['GET'])]
+    public function getAllCourciers(CoursiersRepository $coursiersRepository): JsonResponse
+    {
+        $courciers = $coursiersRepository->findAll();
+
+        $courciersData = [];
+        foreach ($courciers as $courcier) {
+            $courciersData[] = [
+                'id' => $courcier->getIdCoursier(),
+                'name' => $courcier->getNom(),
+                'lastname' => $courcier->getPrenom(),
+                'email' => $courcier->getEmail(),
+                'role' => $courcier->getRole(),
+                'tele' => $courcier->getTele(),
+                'cin' => $courcier->getCin(),
+                'datedintegration' => $courcier->getDateIntergration(),
+                'salaire' => $courcier->getSalaire(),
+            ];
+        }
+
+        return $this->json($courciersData);
+    }
+//*******************************************************************
+
 }
