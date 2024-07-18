@@ -160,11 +160,76 @@ class CoursiersController extends AbstractController
                 'tele' => $courcier->getTele(),
                 'cin' => $courcier->getCin(),
                 'datedintegration' => $courcier->getDateIntergration(),
-                'salaire' => $courcier->getSalaire(),
+                'salaire' => $courcier->getSalaire()
             ];
         }
 
         return $this->json($courciersData);
+    }
+//*******************************************************************
+
+
+//********************************UPDATE COURSIER***********************************
+    #[Route('/api/courciers/{id}/update', name: 'update_courcier', methods: ['PUT'])]
+    public function updateCourcier(int $id, Request $request, EntityManagerInterface $entityManager): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+
+        // Fetch the existing courcier entity from database
+        $courcier = $entityManager->getRepository(Coursiers::class)->find($id);
+
+        if (!$courcier) {
+            return $this->json(['message' => 'Courcier not found'], 404);
+        }
+
+        // Update fields if provided in the request
+        if (isset($data['nom'])) {
+            $courcier->setNom($data['nom']);
+        }
+        if (isset($data['prenom'])) {
+            $courcier->setPrenom($data['prenom']);
+        }
+        if (isset($data['tele'])) {
+            $courcier->setTele($data['tele']);
+        }
+
+        // Persist changes to database
+        $entityManager->flush();
+
+        // Prepare and return response
+        $updatedData = [
+            'id' => $courcier->getIdCoursier(),
+            'name' => $courcier->getNom(),
+            'lastname' => $courcier->getPrenom(),
+            'email' => $courcier->getEmail(),
+            'role' => $courcier->getRole(),
+            'tele' => $courcier->getTele(),
+            'cin' => $courcier->getCin(),
+            'datedintegration' => $courcier->getDateIntergration(),
+            'salaire' => $courcier->getSalaire()
+        ];
+
+        return $this->json($updatedData);
+    }
+//*******************************************************************
+
+
+//*******************************DELETE COURSIER***********************************
+    #[Route('/api/courciers/{id}', name: 'delete_courcier', methods: ['DELETE'])]
+    public function deleteCourcier(int $id, EntityManagerInterface $entityManager): JsonResponse
+    {
+        // Fetch the existing courcier entity from database
+        $courcier = $entityManager->getRepository(Coursiers::class)->find($id);
+
+        if (!$courcier) {
+            return $this->json(['message' => 'Courcier not found'], 404);
+        }
+
+        // Remove the entity from EntityManager
+        $entityManager->remove($courcier);
+        $entityManager->flush();
+
+        return $this->json(['message' => 'Courcier deleted successfully']);
     }
 //*******************************************************************
 
