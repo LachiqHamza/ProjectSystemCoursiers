@@ -169,6 +169,54 @@ class ClientController extends AbstractController
 //***********************************************************************************************
 
 
+
+//***********************************************************************************************
+    #[Route('/api/clients/add', name: 'add_client', methods: ['POST'])]
+    public function addClient(Request $request, ClientRepository $clientRepository, EntityManagerInterface $entityManager): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+
+        $name = $data['name'] ?? null;
+        $lastname = $data['lastname'] ?? null;
+        $email = $data['email'] ?? null;
+        $password = $data['password'] ?? null;
+        $tele = $data['tele'] ?? null;
+        $role = $data['role'] ?? null;
+
+        if (!$name || !$lastname || !$email || !$password || !$tele || !$role) {
+            return $this->json(['message' => 'All fields are required'], 400);
+        }
+
+        // Check if the email already exists in the Client table
+        $existingClient = $clientRepository->findOneBy(['email' => $email]);
+        if ($existingClient) {
+            return $this->json(['message' => 'Email already exists'], 409);
+        }
+
+        // Create a new client
+        $client = new Client($name, $lastname, $email, $password, $tele, $role);
+
+        // Persist the new client to the database
+        $entityManager->persist($client);
+        $entityManager->flush();
+
+        // Return the new client data
+        $clientData = [
+            'id' => $client->getId(),
+            'name' => $client->getName(),
+            'lastname' => $client->getLastname(),
+            'email' => $client->getEmail(),
+            'tele' => $client->getTele(),
+            'role' => $client->getRole()
+        ];
+
+        return $this->json($clientData, 201);
+    }
+
+
+//***********************************************************************************************
+
+
     #[Route('/api/clients', name: 'create_client', methods: ['POST'])]
     public function createClient(Request $request, EntityManagerInterface $entityManager, SerializerInterface $serializer): JsonResponse
     {
