@@ -255,7 +255,24 @@ class ClientController extends AbstractController
 //***********************************************************************************************
 
 
-//***********************************************************************************************
+//****************************DELETE CLIENT*******************************************************************
+    #[Route('/api/clients/{id}', name: 'delete_client', methods: ['DELETE'])]
+    public function deleteClient(int $id, EntityManagerInterface $entityManager): JsonResponse
+    {
+        // Fetch the client entity to delete
+        $client = $entityManager->getRepository(Client::class)->find($id);
+
+        if (!$client) {
+            return $this->json(['message' => 'Client not found'], 404);
+        }
+
+        // Remove the client entity
+        $entityManager->remove($client);
+        $entityManager->flush();
+
+        // Return success response
+        return $this->json(['message' => 'Client deleted successfully']);
+    }
 //***********************************************************************************************
 
 
@@ -301,7 +318,7 @@ class ClientController extends AbstractController
         return $this->json($client);
     }
 */
-    #[Route('/api/clients/{id}', name: 'delete_client', methods: ['DELETE'])]
+    /*#[Route('/api/clients/{id}', name: 'delete_client', methods: ['DELETE'])]
     public function deleteClient(ClientRepository $clientRepository, EntityManagerInterface $entityManager, int $id): JsonResponse
     {
         $client = $clientRepository->find($id);
@@ -314,5 +331,5 @@ class ClientController extends AbstractController
         $entityManager->flush();
 
         return $this->json(['message' => 'Client deleted']);
-    }
+    }*/
 }
