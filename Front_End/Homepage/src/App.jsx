@@ -35,7 +35,7 @@ const App = () => {
         <Navigation />
         <Routes>
           <Route
-            path="/homepage"
+            path="/"
             element={
               <>
                 <Header data={landingPageData.Header} />
