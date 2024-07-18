@@ -88,4 +88,57 @@ class CoursiersController extends AbstractController
 
         return $this->json(['message' => 'Coursier deleted']);
     }
+
+
+//*******************************************************************
+    #[Route('/api/courciers/add', name: 'add_courcier', methods: ['POST'])]
+    public function addCourcier(Request $request, CoursiersRepository $courcierRepository, EntityManagerInterface $entityManager): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+
+        $nom = $data['nom'] ?? null;
+        $prenom = $data['prenom'] ?? null;
+        $tele = $data['tele'] ?? null;
+        $email = $data['email'] ?? null;
+        $password = $data['password'] ?? null;
+        $role = $data['role'] ?? null;
+        $cin = $data['Cin'] ?? null;
+        $dateIntegration = isset($data['Date_intergration']) ? new \DateTime($data['Date_intergration']) : null;
+        $salaire = isset($data['salaire']) ? floatval($data['salaire']) : null;
+
+        if (!$nom || !$prenom || !$tele || !$email || !$password || !$role || !$cin || !$dateIntegration || !$salaire) {
+            return $this->json(['message' => 'All fields are required'], 400);
+        }
+
+        // Check if the email already exists in the Courcier table
+        $existingCourcier = $courcierRepository->findOneBy(['email' => $email]);
+        if ($existingCourcier) {
+            return $this->json(['message' => 'Email already exists'], 409);
+        }
+
+
+        // Create a new courcier
+        $courcier = new Coursiers($nom, $prenom, $tele, $email, $password, $role, $cin, $dateIntegration, $salaire);
+
+        // Persist the new courcier to the database
+        $entityManager->persist($courcier);
+        $entityManager->flush();
+
+        // Return the new courcier data
+        $courcierData = [
+            'id' => $courcier->getIdCoursier(),
+            'nom' => $courcier->getNom(),
+            'prenom' => $courcier->getPrenom(),
+            'tele' => $courcier->getTele(),
+            'email' => $courcier->getEmail(),
+            'role' => $courcier->getRole(),
+            'Cin' => $courcier->getCin(),
+            'Date_intergration' => $courcier->getDateIntergration()->format('Y-m-d'),
+            'salaire' => $courcier->getSalaire()
+        ];
+
+        return $this->json($courcierData, 201);
+    }
+//*******************************************************************
+
 }
