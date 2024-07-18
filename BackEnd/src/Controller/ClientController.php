@@ -3,6 +3,10 @@
 namespace App\Controller;
 
 use App\Entity\Client;
+use App\Entity\Coursiers;
+use App\Entity\Admin;
+use App\Repository\AdminRepository;
+use App\Repository\CoursiersRepository;
 use App\Repository\ClientRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -14,6 +18,8 @@ use Symfony\Component\Serializer\Exception\NotEncodableValueException;
 
 class ClientController extends AbstractController
 {
+
+//***********************************************************************************************
     #[Route('/api/clients', name: 'get_clients', methods: ['GET'])]
     public function getClients(ClientRepository $clientRepository): JsonResponse
     {
@@ -66,7 +72,9 @@ class ClientController extends AbstractController
 
         return $this->json($responseData);
     }
+//***********************************************************************************************
 
+//***********************************************************************************************
     #[Route('/api/clients/{id}', name: 'get_client', methods: ['GET'])]
     public function getClient(ClientRepository $clientRepository, int $id): JsonResponse
     {
@@ -76,8 +84,90 @@ class ClientController extends AbstractController
             return $this->json(['message' => 'Client not found'], 404);
         }
 
-        return $this->json($client);
+        $clientData = [
+            'id_client' => $client->getId(),
+            'name' => $client->getName(),
+            'lastname' => $client->getLastname(),
+            'email' => $client->getEmail(),
+            'tele' => $client->getTele(),
+            'role' => $client->getRole(),
+            'password' => $client->getPassword()
+        ];
+        return $this->json($clientData);
     }
+//***********************************************************************************************
+
+//********************LOGIN METHOD********************************************************
+    #[Route('/api/login', name: 'login', methods: ['POST'])]
+    public function login(Request $request, ClientRepository $clientRepository, CoursiersRepository $courcierRepository, AdminRepository $adminRepository): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+        $email = $data['email'] ?? null;
+        $password = $data['password'] ?? null;
+
+        if (!$email || !$password) {
+            return $this->json(['message' => 'Email and password are required'], 400);
+        }
+
+        $user = $clientRepository->findOneBy(['email' => $email]);
+        if ($user) {
+            if (!$password == $user->getPassword()) {
+                return $this->json(['message' => 'Invalid email or password'], 401);
+            }
+            $userData = [
+                'id' => $user->getId(),
+                'name' => $user->getName(),
+                'lastname' => $user->getLastname(),
+                'email' => $user->getEmail(),
+                'role' => $user->getRole(),
+                'tele' => $user->getTele()
+            ];
+            return $this->json($userData);
+        }
+
+        $user = $courcierRepository->findOneBy(['email' => $email]);
+        if ($user) {
+            if (!$password == $user->getPassword()) {
+                return $this->json(['message' => 'Invalid email or password'], 401);
+            }
+            $userData = [
+                'id' => $user->getIdCoursier(),
+                'name' => $user->getNom(),
+                'lastname' => $user->getPrenom(),
+                'email' => $user->getEmail(),
+                'role' => $user->getRole(),
+                'tele' => $user->getTele(),
+                'cin' => $user->getCin(),
+                'datedintegration' => $user->getDateIntergration(),
+                'salaire' => $user->getSalaire(),
+            ];
+            return $this->json($userData);
+        }
+
+        $user = $adminRepository->findOneBy(['email' => $email]);
+        if ($user) {
+            if (!$password == $user->getPassword()) {
+                return $this->json(['message' => 'Invalid email or password'], 401);
+            }
+            $userData = [
+                'id' => $user->getIdAdmin(),
+                'name' => $user->getNom(),
+                'lastname' => $user->getPrenom(),
+                'email' => $user->getEmail(),
+                'role' => $user->getRole(),
+                'tele' => $user->getTele(),
+                'cin' => $user->getCin(),
+                'datedintegration' => $user->getDateIntergration(),
+                'salaire' => $user->getSalaire(),
+            ];
+            return $this->json($userData);
+        }
+
+        return $this->json(['message' => 'Invalid email or password******'], 401);
+    }
+
+//***********************************************************************************************
+
 
     #[Route('/api/clients', name: 'create_client', methods: ['POST'])]
     public function createClient(Request $request, EntityManagerInterface $entityManager, SerializerInterface $serializer): JsonResponse
