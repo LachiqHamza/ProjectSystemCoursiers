@@ -19,7 +19,7 @@ use Symfony\Component\Serializer\Exception\NotEncodableValueException;
 class ClientController extends AbstractController
 {
 
-//***********************************************************************************************
+//*******************************GET ALL CLIENT****************************************************************
     #[Route('/api/clients', name: 'get_clients', methods: ['GET'])]
     public function getClients(ClientRepository $clientRepository): JsonResponse
     {
@@ -217,6 +217,48 @@ class ClientController extends AbstractController
 //***********************************************************************************************
 
 
+//*********************************UPDATE CLIENT**************************************************************
+    #[Route('/api/clients/{id}/update', name: 'update_client', methods: ['PUT'])]
+    public function updateClient(int $id, Request $request, EntityManagerInterface $entityManager): JsonResponse
+    {
+        $client = $entityManager->getRepository(Client::class)->find($id);
+
+        if (!$client) {
+            return $this->json(['message' => 'Client not found'], 404);
+        }
+
+        $data = json_decode($request->getContent(), true);
+
+        // Update the client entity with new data
+        $client->setName($data['name'] ?? $client->getName());
+        $client->setLastname($data['lastname'] ?? $client->getLastname());
+        $client->setTele($data['tele'] ?? $client->getTele());
+        $client->setPassword($data['password'] ?? $client->getPassword());
+
+        // Persist the updated entity to database
+        $entityManager->persist($client);
+        $entityManager->flush();
+
+        // Prepare the response data
+        $clientData = [
+            'id_client' => $client->getId(),
+            'name' => $client->getName(),
+            'lastname' => $client->getLastname(),
+            'email' => $client->getEmail(),
+            'tele' => $client->getTele(),
+            'role' => $client->getRole(),
+            'password' => $client->getPassword()
+        ];
+
+        return $this->json($clientData);
+    }
+//***********************************************************************************************
+
+
+//***********************************************************************************************
+//***********************************************************************************************
+
+
     #[Route('/api/clients', name: 'create_client', methods: ['POST'])]
     public function createClient(Request $request, EntityManagerInterface $entityManager, SerializerInterface $serializer): JsonResponse
     {
@@ -236,7 +278,7 @@ class ClientController extends AbstractController
         return $this->json($client, 201);
     }
 
-    #[Route('/api/clients/{id}', name: 'update_client', methods: ['PUT'])]
+    /*#[Route('/api/clients/{id}', name: 'update_client', methods: ['PUT'])]
     public function updateClient(Request $request, ClientRepository $clientRepository, EntityManagerInterface $entityManager, int $id): JsonResponse
     {
         $client = $clientRepository->find($id);
@@ -258,7 +300,7 @@ class ClientController extends AbstractController
 
         return $this->json($client);
     }
-
+*/
     #[Route('/api/clients/{id}', name: 'delete_client', methods: ['DELETE'])]
     public function deleteClient(ClientRepository $clientRepository, EntityManagerInterface $entityManager, int $id): JsonResponse
     {
