@@ -20,7 +20,7 @@ const LoginForm = ({ onRegisterClick }) => {
       if (user.role === 'client') {
         navigate('/client-dashboard');
       } else if (user.role === 'admin') {
-        navigate('/admin-dashboard');
+        navigate('/admin');
       } else if (user.role === 'coursier') {
         navigate('/coursier-dashboard');
       }
