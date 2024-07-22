@@ -202,6 +202,11 @@ class CoursiersController extends AbstractController
         if (isset($data['tele'])) {
             $courcier->setTele($data['tele']);
         }
+        if(isset($data['salaire'])){
+            $courcier->setSalaire($data['salaire']);
+        }if(isset($data['passwd'])){
+            $courcier->setPassword($data['passwd']);
+    }
 
         // Persist changes to database
         $entityManager->flush();
