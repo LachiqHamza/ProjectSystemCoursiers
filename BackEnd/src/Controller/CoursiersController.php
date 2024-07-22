@@ -144,7 +144,8 @@ class CoursiersController extends AbstractController
             'role' => $courcier->getRole(),
             'Cin' => $courcier->getCin(),
             'Date_intergration' => $courcier->getDateIntergration()->format('Y-m-d'),
-            'salaire' => $courcier->getSalaire()
+            'salaire' => $courcier->getSalaire(),
+            'demandes' => $courcier->getDemandes()
         ];
 
         return $this->json($courcierData, 201);
