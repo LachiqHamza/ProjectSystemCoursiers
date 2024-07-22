@@ -17,7 +17,7 @@ const CoursierList = () => {
   useEffect(() => {
     const fetchCoursiers = async () => {
       try {
-        const response = await axios.get('http://localhost:8000/api/api/coursiers');
+        const response = await axios.get('http://localhost:8000/api/courciers/all');
         setCoursiers(response.data);
       } catch (error) {
         console.error('Error fetching coursiers:', error);
@@ -29,8 +29,8 @@ const CoursierList = () => {
   const showUpdateModal = (coursier) => {
     setSelectedCoursier(coursier);
     setUpdateData({
-      nom: coursier.nom || '',
-      prenom: coursier.prenom || '',
+      nom: coursier.name || '',
+      prenom: coursier.lastname || '',
       tele: coursier.tele || '',
       salaire: coursier.salaire || '',
       passwd: ''
@@ -49,15 +49,15 @@ const CoursierList = () => {
   const handleUpdateSubmit = async () => {
     if (selectedCoursier) {
       try {
-        await axios.put(`http://localhost:8000/api/coursiers/${selectedCoursier.id_coursier}`, {
+        await axios.put(`http://localhost:8000/api/courciers/${selectedCoursier.id}/update`, {
           nom: updateData.nom,
           prenom: updateData.prenom,
           tele: updateData.tele,
           salaire: updateData.salaire,
           passwd: updateData.passwd
         });
-        // Update the list after successful update
-        const response = await axios.get('http://localhost:8000/api/api/coursiers');
+
+        const response = await axios.get('http://localhost:8000/api/courciers/all');
         setCoursiers(response.data);
         setIsModalVisible(false);
         setSelectedCoursier(null);
@@ -77,8 +77,7 @@ const CoursierList = () => {
   const handleDelete = async (id) => {
     try {
       await axios.delete(`http://localhost:8000/api/coursiers/${id}`);
-      // Update the list after successful delete
-      const response = await axios.get('http://localhost:8000/api/api/coursiers');
+      const response = await axios.get('http://localhost:8000/api/courciers/all');
       setCoursiers(response.data);
     } catch (error) {
       console.error('Error deleting coursier:', error);
@@ -88,13 +87,13 @@ const CoursierList = () => {
   const columns = [
     {
       title: 'Nom',
-      dataIndex: 'nom',
-      key: 'nom',
+      dataIndex: 'name',
+      key: 'name',
     },
     {
       title: 'Prenom',
-      dataIndex: 'prenom',
-      key: 'prenom',
+      dataIndex: 'lastname',
+      key: 'lastname',
     },
     {
       title: 'Tele',
@@ -122,7 +121,7 @@ const CoursierList = () => {
           </Button>
           <Popconfirm
             title="Are you sure to delete this coursier?"
-            onConfirm={() => handleDelete(record.id_coursier)}
+            onConfirm={() => handleDelete(record.id)}
             okText="Yes"
             cancelText="No"
           >
@@ -136,7 +135,7 @@ const CoursierList = () => {
   return (
     <div style={{ padding: '24px' }}>
       <h1>Coursier List</h1>
-      <Table dataSource={coursiers} columns={columns} rowKey="id_coursier" />
+      <Table dataSource={coursiers} columns={columns} rowKey="id" />
 
       <Modal
         title="Update Coursier"
