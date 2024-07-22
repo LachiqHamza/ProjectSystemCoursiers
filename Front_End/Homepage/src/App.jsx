@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
 import { Navigation } from "./components/navigation";
 import { Header } from "./components/header";
 import { Features } from "./components/features";
@@ -10,21 +10,25 @@ import { Team } from "./components/Team";
 import { Contact } from "./components/contact";
 import JsonData from "./data/data.json";
 import SmoothScroll from "smooth-scroll";
-
-import LoginForm from "./components/LogingAndSignup/login";
-import Signup from "./components/LogingAndSignup/signup"; 
+import Signup from "./components/LogingAndSignup/signup";
 import ErrorPage from "./components/LogingAndSignup/errorpage";
-
-import "./App.css";
 import LoginFormWrapper from "./components/LogingAndSignup/loginformWrapper";
+import AdminPage from "./components/admincomponents/adminPage";
 
 export const scroll = new SmoothScroll('a[href*="#"]', {
   speed: 1000,
   speedAsDuration: true,
 });
 
+const NavigationWrapper = () => {
+  const location = useLocation();
+  // Show Navigation only on the homepage
+  return location.pathname === '/' ? <Navigation /> : null;
+};
+
 const App = () => {
   const [landingPageData, setLandingPageData] = useState({});
+
   useEffect(() => {
     setLandingPageData(JsonData);
   }, []);
@@ -32,7 +36,7 @@ const App = () => {
   return (
     <Router>
       <div>
-        <Navigation />
+        <NavigationWrapper /> {/* Navigation logic moved to NavigationWrapper */}
         <Routes>
           <Route
             path="/"
@@ -51,7 +55,7 @@ const App = () => {
           <Route path="/login" element={<LoginFormWrapper />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/error" element={<ErrorPage />} />
-          
+          <Route path="/admin/*" element={<AdminPage />} /> {/* Ensure AdminPage handles nested routes */}
         </Routes>
       </div>
     </Router>
