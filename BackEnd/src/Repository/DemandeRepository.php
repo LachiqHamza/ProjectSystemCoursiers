@@ -87,7 +87,7 @@ class DemandeRepository extends ServiceEntityRepository
     public function findNweDemandesNullAdminAndCoursier(): array
     {
         return $this->createQueryBuilder('d')
-            ->where('d.id_admin IS NULL')
+            ->where('d.admin IS NULL')
             ->andWhere('d.coursier IS NULL')
             ->getQuery()
             ->getResult();
@@ -101,7 +101,7 @@ class DemandeRepository extends ServiceEntityRepository
     {
         $query = $this->createQueryBuilder('d')
             ->select('COUNT(d.id_demande)')
-            ->where('d.id_admin IS NULL')
+            ->where('d.admin IS NULL')
             ->andWhere('d.coursier IS NULL')
             ->getQuery();
 

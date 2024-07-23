@@ -27,7 +27,7 @@ class Demande
      * @var Admin|null
      */
     #[ORM\ManyToOne(targetEntity: Admin::class)]
-    #[ORM\JoinColumn(name: "admin", referencedColumnName: "id_admin", nullable: true)]
+    #[ORM\JoinColumn(name: "id_admin", referencedColumnName: "id_admin", nullable: true)]
     private ?Admin $admin =null;
 
     /**
@@ -108,17 +108,17 @@ class Demande
     /**
      * @return Admin|null
      */
-    public function getIdAdmin(): ?Admin
+    public function getAdmin(): ?Admin
     {
-        return $this->id_admin;
+        return $this->admin;
     }
 
     /**
      * @param Admin|null $id_admin
      */
-    public function setIdAdmin(?Admin $id_admin): void
+    public function setAdmin(?Admin $admin): void
     {
-        $this->id_admin = $id_admin;
+        $this->admin = $admin;
     }
 
     /**

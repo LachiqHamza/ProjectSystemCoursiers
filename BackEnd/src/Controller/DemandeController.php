@@ -114,13 +114,13 @@ class DemandeController extends AbstractController
             $data = json_decode($request->getContent(), true);
 
             $client = $this->entityManager->getRepository(Client::class)->find($data['client']['id_client']);
-            $admin = isset($data['$id_admin']['id_admin']) ? $this->entityManager->getRepository(Admin::class)->find($data['$id_admin']['id_admin']) : null;
+            $admin = isset($data['admin']['id_admin']) ? $this->entityManager->getRepository(Admin::class)->find($data['admin']['id_admin']) : null;
             $coursier = isset($data['coursier']['id_coursier']) ? $this->entityManager->getRepository(Coursiers::class)->find($data['coursier']['id_coursier']) : null;
 
             $demande = new Demande();
             $demande->setDescription($data['description']);
             $demande->setClient($client);
-            $demande->setIdAdmin($admin);
+            $demande->setAdmin($admin);
             $demande->setCoursier($coursier);
             $demande->setAdressSource($data['adress_source']);
             $demande->setAdressDest($data['adress_dest']);
@@ -163,7 +163,7 @@ class DemandeController extends AbstractController
             ];
 
 
-            $admin = $demande->getIdAdmin();
+            $admin = $demande->getAdmin();
             if ($admin !== null) {
                 $demandeData['admin'] = [
                     'id_admin' => $admin->getIdAdmin(),
@@ -244,7 +244,7 @@ class DemandeController extends AbstractController
                     'client_phone' => $demande->getClient()->getTele(),
                     'client_role' => $demande->getClient()->getRole(),
                 ] : null,
-                'id_admin' => $demande->getIdAdmin() ? $demande->getIdAdmin()->getIdAdmin() : null,
+                'id_admin' => $demande->getAdmin() ? $demande->getAdmin()->getIdAdmin() : null,
                 'coursier' => $demande->getCoursier() ? $demande->getCoursier()->getIdCoursier() : null,
                 'adress_source' => $demande->getAdressSource(),
                 'adress_dest' => $demande->getAdressDest(),
