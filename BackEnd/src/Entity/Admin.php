@@ -46,7 +46,7 @@ class Admin
     /**
      * @var Collection<int, Demande>
      */
-    #[ORM\OneToMany(mappedBy: 'id_admin', targetEntity: Demande::class)]
+    #[ORM\OneToMany(mappedBy: 'admin', targetEntity: Demande::class)]
     private Collection $demandes;
 
     public function __construct(

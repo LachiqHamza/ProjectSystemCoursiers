@@ -3,6 +3,9 @@
 namespace App\Controller;
 
 use App\Entity\Demande;
+use App\Entity\Client;
+use App\Entity\Admin;
+use App\Entity\Coursiers;
 use App\Repository\DemandeRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -49,22 +52,7 @@ class DemandeController extends AbstractController
         return $this->json($demande);
     }
 
-    #[Route('/', name: 'create_demande', methods: ['POST'])]
-    public function createDemande(Request $request): JsonResponse
-    {
-        try {
-            $data = $request->getContent();
-            $demande = $this->serializer->deserialize($data, Demande::class, 'json');
-            $this->entityManager->persist($demande);
-            $this->entityManager->flush();
 
-            return $this->json($demande, 201);
-        } catch (NotEncodableValueException $e) {
-            return $this->json(['message' => 'Invalid JSON format'], 400);
-        } catch (InvalidArgumentException $e) {
-            return $this->json(['message' => 'Invalid data provided'], 400);
-        }
-    }
 
     #[Route('/{id}', name: 'update_demande', methods: ['PUT'])]
     public function updateDemande(Request $request, int $id): JsonResponse
@@ -117,6 +105,42 @@ class DemandeController extends AbstractController
         return $this->json(['message' => 'Demande deleted']);
     }
 
+
+//**********************************************************************************************************
+    #[Route('/add', name: 'create_demande', methods: ['POST'])]
+    public function createDemande(Request $request): JsonResponse
+    {
+        try {
+            $data = json_decode($request->getContent(), true);
+
+            $client = $this->entityManager->getRepository(Client::class)->find($data['client']['id_client']);
+            $admin = isset($data['$id_admin']['id_admin']) ? $this->entityManager->getRepository(Admin::class)->find($data['$id_admin']['id_admin']) : null;
+            $coursier = isset($data['coursier']['id_coursier']) ? $this->entityManager->getRepository(Coursiers::class)->find($data['coursier']['id_coursier']) : null;
+
+            $demande = new Demande();
+            $demande->setDescription($data['description']);
+            $demande->setClient($client);
+            $demande->setIdAdmin($admin);
+            $demande->setCoursier($coursier);
+            $demande->setAdressSource($data['adress_source']);
+            $demande->setAdressDest($data['adress_dest']);
+            $demande->setPoids($data['poids']);
+            $demande->setDateDemande(new \DateTime($data['date_demande']));
+            $demande->setStatus($data['status'] ?? null);
+            $demande->setDateLivraison($data['date_livraison'] ? new \DateTime($data['date_livraison']) : null);
+
+            $this->entityManager->persist($demande);
+            $this->entityManager->flush();
+
+            return $this->json($demande, 201);
+        } catch (NotEncodableValueException $e) {
+            return $this->json(['message' => 'Invalid JSON format'], 400);
+        } catch (InvalidArgumentException $e) {
+            return $this->json(['message' => 'Invalid data provided'], 400);
+        }
+    }
+
+//**********************************************************************************************************
 
 //**********************************************************************************************************
     #[Route('/demandes/{coursierId}', name: 'demandes_by_coursier', methods: ['GET'])]

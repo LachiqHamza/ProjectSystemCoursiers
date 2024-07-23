@@ -21,21 +21,21 @@ class Demande
      */
     #[ORM\ManyToOne(targetEntity: Client::class)]
     #[ORM\JoinColumn(name: "id_client", referencedColumnName: "id_client", nullable: true)]
-    private ?Client $client;
+    private ?Client $client =null;
 
     /**
      * @var Admin|null
      */
     #[ORM\ManyToOne(targetEntity: Admin::class)]
-    #[ORM\JoinColumn(name: "id_admin", referencedColumnName: "id_admin", nullable: true)]
-    private ?Admin $id_admin;
+    #[ORM\JoinColumn(name: "admin", referencedColumnName: "id_admin", nullable: true)]
+    private ?Admin $admin =null;
 
     /**
      * @var Coursiers|null
      */
     #[ORM\ManyToOne(targetEntity: Coursiers::class)]
     #[ORM\JoinColumn(name: "id_coursier", referencedColumnName: "id_coursier", nullable: true)]
-    private ?Coursiers $coursier;
+    private ?Coursiers $coursier = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $adress_source = null;

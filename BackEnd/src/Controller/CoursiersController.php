@@ -171,7 +171,8 @@ class CoursiersController extends AbstractController
                 'tele' => $courcier->getTele(),
                 'cin' => $courcier->getCin(),
                 'datedintegration' => $courcier->getDateIntergration(),
-                'salaire' => $courcier->getSalaire()
+                'salaire' => $courcier->getSalaire(),
+                //'demandes' => $courcier->getDemandes()
             ];
         }
 
@@ -222,7 +223,8 @@ class CoursiersController extends AbstractController
             'tele' => $courcier->getTele(),
             'cin' => $courcier->getCin(),
             'datedintegration' => $courcier->getDateIntergration(),
-            'salaire' => $courcier->getSalaire()
+            'salaire' => $courcier->getSalaire(),
+            //'demandes' => $courcier->getDemandes()->getIdDemande()
         ];
 
         return $this->json($updatedData);
