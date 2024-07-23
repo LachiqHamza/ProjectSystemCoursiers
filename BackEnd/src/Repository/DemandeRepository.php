@@ -110,4 +110,17 @@ class DemandeRepository extends ServiceEntityRepository
 //********************************************************************************************************
 
 
+//********************************************************************************************************
+    public function findAllDemandesByClient(int $clientId): array
+    {
+        return $this->createQueryBuilder('d')
+            ->andWhere('d.client = :clientId')
+            ->setParameter('clientId', $clientId)
+            ->getQuery()
+            ->getResult();
+    }
+
+//********************************************************************************************************
+
+
 }
