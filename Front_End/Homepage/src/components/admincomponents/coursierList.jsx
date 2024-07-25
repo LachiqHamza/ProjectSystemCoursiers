@@ -1,252 +1,242 @@
 import React, { useState, useEffect } from 'react';
+import { Table, Button, Modal, Form, Input, DatePicker, notification } from 'antd';
 import axios from 'axios';
-import { Table, Button, Modal, Form, Input, InputNumber, notification, DatePicker, Card, Col, Row } from 'antd';
 import { EditOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons';
+import moment from 'moment';
+
+const { Column } = Table;
 
 const CoursierList = () => {
-  const [courciers, setCourciers] = useState([]);
-  const [isEditModalVisible, setIsEditModalVisible] = useState(false);
-  const [isAddModalVisible, setIsAddModalVisible] = useState(false);
-  const [currentCoursier, setCurrentCoursier] = useState(null);
+  const [coursiers, setCoursiers] = useState([]);
+  const [isModalVisible, setIsModalVisible] = useState(false);
   const [form] = Form.useForm();
+  const [editingCourcier, setEditingCourcier] = useState(null);
 
   useEffect(() => {
-    fetchCourciers();
+    fetchCoursiers();
   }, []);
 
-  const fetchCourciers = async () => {
+  const fetchCoursiers = async () => {
     try {
       const response = await axios.get('http://localhost:8000/api/courciers/all');
-      setCourciers(response.data);
+      setCoursiers(response.data);
     } catch (error) {
-      console.error('Error fetching courciers:', error);
+      console.error('Error fetching coursiers:', error);
     }
   };
 
-  const handleEdit = (coursier) => {
-    setCurrentCoursier(coursier);
-    form.setFieldsValue({
-      nom: coursier.nom,
-      prenom: coursier.prenom,
-      tele: coursier.tele,
-      email: coursier.email,
-      salaire: coursier.salaire,
-      password: '', // Clear the password field
-    });
-    setIsEditModalVisible(true);
-  };
+  const handleAddCourcier = async (values) => {
+    const addData = {
+      ...values,
+      Date_intergration: values.Date_intergration.format('YYYY-MM-DD'),
+    };
 
-  const handleAdd = async () => {
     try {
-      const values = form.getFieldsValue();
-      await axios.post('http://localhost:8000/api/courciers/add', {
-        nom: values.nom,
-        prenom: values.prenom,
-        tele: values.tele,
-        email: values.email,
-        password: values.password,
-        role: values.role,
-        Cin: values.Cin,
-        Date_intergration: values.Date_intergration.format('YYYY-MM-DD'),
-        salaire: values.salaire,
-      });
+      const response = await axios.post('http://localhost:8000/api/courciers/add', addData);
+      setCoursiers([...coursiers, response.data]);
+      setIsModalVisible(false);
+      form.resetFields();
       notification.success({
         message: 'Success',
         description: 'Coursier added successfully.',
-        icon: <PlusOutlined style={{ color: 'green' }} />,
+        icon: <PlusOutlined style={{ color: '#52c41a' }} />,
       });
-      fetchCourciers(); // Refresh the list
-      setIsAddModalVisible(false);
     } catch (error) {
-      console.error('Error adding courcier:', error);
+      console.error('Error adding coursier:', error);
     }
   };
 
-  const handleUpdate = async () => {
+  const handleUpdateCourcier = async (values) => {
+    const updateData = {
+      nom: values.nom,
+      prenom: values.prenom,
+      tele: values.tele,
+      salaire: values.salaire,
+      passwd: values.password,
+    };
+
     try {
-      const values = form.getFieldsValue();
-      await axios.put(`http://localhost:8000/api/courciers/${currentCoursier.id}/update`, {
-        nom: values.nom,
-        prenom: values.prenom,
-        tele: values.tele,
-        salaire: values.salaire,
-        passwd: values.password, // Update password if provided
-      });
+      const response = await axios.put(`http://localhost:8000/api/courciers/${editingCourcier.id}/update`, updateData);
+      const updatedCoursiers = coursiers.map(courcier =>
+        courcier.id === response.data.id ? response.data : courcier
+      );
+      setCoursiers(updatedCoursiers);
+      setEditingCourcier(null);
+      setIsModalVisible(false);
       notification.success({
         message: 'Success',
         description: 'Coursier updated successfully.',
-        icon: <EditOutlined style={{ color: 'green' }} />,
+        icon: <EditOutlined style={{ color: '#1890ff' }} />,
       });
-      fetchCourciers(); // Refresh the list
-      setIsEditModalVisible(false);
     } catch (error) {
-      console.error('Error updating courcier:', error);
+      console.error('Error updating coursier:', error);
     }
   };
 
-  const handleDelete = async (id) => {
+  const handleDeleteCourcier = async (id) => {
     try {
       await axios.delete(`http://localhost:8000/api/courciers/${id}`);
+      setCoursiers(coursiers.filter(courcier => courcier.id !== id));
       notification.success({
         message: 'Success',
         description: 'Coursier deleted successfully.',
-        icon: <DeleteOutlined style={{ color: 'red' }} />,
+        icon: <DeleteOutlined style={{ color: '#ff4d4f' }} />,
       });
-      fetchCourciers(); // Refresh the list
     } catch (error) {
-      console.error('Error deleting courcier:', error);
+      console.error('Error deleting coursier:', error);
     }
   };
 
-  const columns = [
-    {
-      title: 'Nom',
-      dataIndex: 'nom',
-      key: 'nom',
-    },
-    {
-      title: 'Prénom',
-      dataIndex: 'prenom',
-      key: 'prenom',
-    },
-    {
-      title: 'Téléphone',
-      dataIndex: 'tele',
-      key: 'tele',
-    },
-    {
-      title: 'Email',
-      dataIndex: 'email',
-      key: 'email',
-    },
-    {
-      title: 'Salaire',
-      dataIndex: 'salaire',
-      key: 'salaire',
-    },
-    {
-      title: 'Actions',
-      key: 'actions',
-      render: (text, record) => (
-        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-          <Button
-            icon={<EditOutlined />}
-            onClick={() => handleEdit(record)}
-            style={{ marginRight: 8 }}
-            type="primary"
-          />
-          <Button
-            icon={<DeleteOutlined />}
-            onClick={() => handleDelete(record.id)}
-            type="danger"
-          />
-        </div>
-      ),
-    },
-  ];
+  const showModal = (courcier = null) => {
+    if (courcier) {
+      const formattedCourcier = {
+        ...courcier,
+        Date_intergration: courcier.Date_intergration ? moment(courcier.Date_intergration) : null,
+      };
+      form.setFieldsValue(formattedCourcier);
+      setEditingCourcier(courcier);
+    } else {
+      form.resetFields();
+      setEditingCourcier(null);
+    }
+    setIsModalVisible(true);
+  };
 
   return (
-    <div style={{ padding: '24px', background: '#fff' }}>
-      <Button
-        type="primary"
-        icon={<PlusOutlined />}
-        onClick={() => setIsAddModalVisible(true)}
+    <>
+      <Button 
+        type="primary" 
+        onClick={() => showModal()} 
+        icon={<PlusOutlined />} 
         style={{ marginBottom: 16 }}
       >
         Add Coursier
       </Button>
-      <Table
-        columns={columns}
-        dataSource={courciers}
-        rowKey="id"
-        bordered
-        pagination={{ pageSize: 10 }}
-        scroll={{ x: 'max-content' }}
-      />
+      <Table 
+        dataSource={coursiers} 
+        rowKey="id" 
+        bordered 
+        pagination={{ pageSize: 5 }}
+        style={{ marginBottom: 20 }}
+      >
+        <Column 
+          title="Full Name" 
+          key="fullName" 
+          render={(text, record) => `${record.name} ${record.lastname}`} 
+        />
+        <Column title="Email" dataIndex="email" key="email" />
+        <Column title="Téléphone" dataIndex="tele" key="tele" />
+        <Column title="Cin" dataIndex="cin" key="cin" />
+        <Column title="Date d'Intégration" dataIndex="datedintegration" key="datedintegration" render={(text) => text ? moment(text).format('YYYY-MM-DD') : ''} />
+        <Column title="Salaire" dataIndex="salaire" key="salaire" />
+        <Column
+          title="Actions"
+          key="actions"
+          render={(text, record) => (
+            <>
+              <Button 
+                icon={<EditOutlined />} 
+                onClick={() => showModal(record)} 
+                style={{ marginRight: 8 }} 
+                type="primary" 
+                ghost
+              />
+              <Button 
+                icon={<DeleteOutlined />} 
+                onClick={() => handleDeleteCourcier(record.id)} 
+                danger
+              />
+            </>
+          )}
+        />
+      </Table>
 
       <Modal
-        title="Add Coursier"
-        visible={isAddModalVisible}
-        onOk={handleAdd}
-        onCancel={() => setIsAddModalVisible(false)}
-        okText="Add"
-        cancelText="Cancel"
-        centered
+        title={editingCourcier ? 'Edit Coursier' : 'Add Coursier'}
+        visible={isModalVisible}
+        onCancel={() => setIsModalVisible(false)}
+        footer={null}
+        destroyOnClose
       >
-        <Form form={form} layout="vertical">
-          <Row gutter={16}>
-            <Col span={12}>
-              <Form.Item label="Nom" name="nom" rules={[{ required: true, message: 'Please enter the nom!' }]}>
-                <Input />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item label="Prénom" name="prenom" rules={[{ required: true, message: 'Please enter the prénom!' }]}>
-                <Input />
-              </Form.Item>
-            </Col>
-          </Row>
-          <Form.Item label="Téléphone" name="tele" rules={[{ required: true, message: 'Please enter the telephone!' }]}>
+        <Form 
+          form={form} 
+          onFinish={editingCourcier ? handleUpdateCourcier : handleAddCourcier} 
+          layout="vertical"
+        >
+          <Form.Item 
+            name="nom" 
+            label="Nom" 
+            rules={[{ required: true, message: 'Please input the nom!' }]}
+          >
             <Input />
           </Form.Item>
-          <Form.Item label="Email" name="email" rules={[{ required: true, message: 'Please enter the email!' }]}>
+          <Form.Item 
+            name="prenom" 
+            label="Prenom" 
+            rules={[{ required: true, message: 'Please input the prenom!' }]}
+          >
             <Input />
           </Form.Item>
-          <Form.Item label="Password" name="password" rules={[{ required: true, message: 'Please enter the password!' }]}>
+          <Form.Item 
+            name="tele" 
+            label="Téléphone" 
+            rules={[{ required: true, message: 'Please input the téléphone!' }]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item 
+            name="email" 
+            label="Email" 
+            rules={[{ required: true, type: 'email', message: 'Please input a valid email!' }]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item 
+            name="password" 
+            label="Password" 
+            rules={[{ required: true, message: 'Please input the password!' }]}
+          >
             <Input.Password />
           </Form.Item>
-          <Form.Item label="Role" name="role" rules={[{ required: true, message: 'Please enter the role!' }]}>
+          <Form.Item 
+            name="Cin" 
+            label="Cin" 
+            rules={[{ required: true, message: 'Please input the Cin!' }]}
+          >
             <Input />
           </Form.Item>
-          <Form.Item label="Cin" name="Cin" rules={[{ required: true, message: 'Please enter the Cin!' }]}>
-            <Input />
-          </Form.Item>
-          <Form.Item label="Date Integration" name="Date_intergration" rules={[{ required: true, message: 'Please select the date!' }]}>
+          <Form.Item 
+            name="Date_intergration" 
+            label="Date d'Intégration" 
+            rules={[{ required: true, message: 'Please select the date of integration!' }]}
+          >
             <DatePicker style={{ width: '100%' }} />
           </Form.Item>
-          <Form.Item label="Salaire" name="salaire" rules={[{ required: true, message: 'Please enter the salary!' }]}>
-            <InputNumber style={{ width: '100%' }} />
+          <Form.Item 
+            name="salaire" 
+            label="Salaire" 
+            rules={[{ required: true, message: 'Please input the salaire!' }]}
+          >
+            <Input type="number" />
+          </Form.Item>
+          <Form.Item
+            name="role"
+            initialValue="courcier"
+            hidden
+          >
+            <Input type="hidden" />
+          </Form.Item>
+          <Form.Item>
+            <Button 
+              type="primary" 
+              htmlType="submit"
+            >
+              {editingCourcier ? 'Update' : 'Add'}
+            </Button>
           </Form.Item>
         </Form>
       </Modal>
-
-      <Modal
-        title="Update Coursier"
-        visible={isEditModalVisible}
-        onOk={handleUpdate}
-        onCancel={() => setIsEditModalVisible(false)}
-        okText="Update"
-        cancelText="Cancel"
-        centered
-      >
-        <Form form={form} layout="vertical">
-          <Row gutter={16}>
-            <Col span={12}>
-              <Form.Item label="Nom" name="nom" rules={[{ required: true, message: 'Please enter the nom!' }]}>
-                <Input />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item label="Prénom" name="prenom" rules={[{ required: true, message: 'Please enter the prénom!' }]}>
-                <Input />
-              </Form.Item>
-            </Col>
-          </Row>
-          <Form.Item label="Téléphone" name="tele" rules={[{ required: true, message: 'Please enter the telephone!' }]}>
-            <Input />
-          </Form.Item>
-          <Form.Item label="Email" name="email">
-            <Input disabled />
-          </Form.Item>
-          <Form.Item label="Password" name="password">
-            <Input.Password />
-          </Form.Item>
-          <Form.Item label="Salaire" name="salaire">
-            <InputNumber style={{ width: '100%' }} />
-          </Form.Item>
-        </Form>
-      </Modal>
-    </div>
+    </>
   );
 };
 
