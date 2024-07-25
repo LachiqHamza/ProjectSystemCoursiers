@@ -14,6 +14,7 @@ import Signup from "./components/LogingAndSignup/signup";
 import ErrorPage from "./components/LogingAndSignup/errorpage";
 import LoginFormWrapper from "./components/LogingAndSignup/loginformWrapper";
 import AdminPage from "./components/admincomponents/adminPage";
+import ClientDemandePage from "./components/ClientDemandePage/ClientDemanePage";
 
 export const scroll = new SmoothScroll('a[href*="#"]', {
   speed: 1000,
@@ -55,7 +56,8 @@ const App = () => {
           <Route path="/login" element={<LoginFormWrapper />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/error" element={<ErrorPage />} />
-          <Route path="/admin/*" element={<AdminPage />} /> {/* Ensure AdminPage handles nested routes */}
+          <Route path="/admin/*" element={<AdminPage />} />
+          <Route path="/client" element={<ClientDemandePage />} />
         </Routes>
       </div>
     </Router>

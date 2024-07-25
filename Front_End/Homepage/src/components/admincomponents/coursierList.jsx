@@ -12,7 +12,16 @@ const CoursierList = () => {
     salaire: '',
     passwd: ''
   });
-  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [newCoursierData, setNewCoursierData] = useState({
+    nom: '',
+    prenom: '',
+    tele: '',
+    email: '',
+    salaire: '',
+    passwd: ''
+  });
+  const [isUpdateModalVisible, setIsUpdateModalVisible] = useState(false);
+  const [isAddModalVisible, setIsAddModalVisible] = useState(false);
 
   useEffect(() => {
     const fetchCoursiers = async () => {
@@ -35,7 +44,7 @@ const CoursierList = () => {
       salaire: coursier.salaire || '',
       passwd: ''
     });
-    setIsModalVisible(true);
+    setIsUpdateModalVisible(true);
   };
 
   const handleUpdateChange = (e) => {
@@ -59,7 +68,7 @@ const CoursierList = () => {
 
         const response = await axios.get('http://localhost:8000/api/courciers/all');
         setCoursiers(response.data);
-        setIsModalVisible(false);
+        setIsUpdateModalVisible(false);
         setSelectedCoursier(null);
         setUpdateData({
           nom: '',
@@ -74,9 +83,56 @@ const CoursierList = () => {
     }
   };
 
+  const showAddModal = () => {
+    setNewCoursierData({
+      nom: '',
+      prenom: '',
+      tele: '',
+      email: '',
+      salaire: '',
+      passwd: ''
+    });
+    setIsAddModalVisible(true);
+  };
+
+  const handleAddChange = (e) => {
+    const { name, value } = e.target;
+    setNewCoursierData((prevData) => ({
+      ...prevData,
+      [name]: value
+    }));
+  };
+
+  const handleAddSubmit = async () => {
+    try {
+      await axios.post('http://localhost:8000/api/courciers/add', {
+        nom: newCoursierData.nom,
+        prenom: newCoursierData.prenom,
+        tele: newCoursierData.tele,
+        email: newCoursierData.email,
+        salaire: newCoursierData.salaire,
+        passwd: newCoursierData.passwd
+      });
+
+      const response = await axios.get('http://localhost:8000/api/courciers/all');
+      setCoursiers(response.data);
+      setIsAddModalVisible(false);
+      setNewCoursierData({
+        nom: '',
+        prenom: '',
+        tele: '',
+        email: '',
+        salaire: '',
+        passwd: ''
+      });
+    } catch (error) {
+      console.error('Error adding coursier:', error);
+    }
+  };
+
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`http://localhost:8000/api/coursiers/${id}`);
+      await axios.delete(`http://localhost:8000/api/courciers/${id}`);
       const response = await axios.get('http://localhost:8000/api/courciers/all');
       setCoursiers(response.data);
     } catch (error) {
@@ -135,13 +191,16 @@ const CoursierList = () => {
   return (
     <div style={{ padding: '24px' }}>
       <h1>Coursier List</h1>
+      <Button type="primary" onClick={showAddModal} style={{ marginBottom: 16 }}>
+        Add Coursier
+      </Button>
       <Table dataSource={coursiers} columns={columns} rowKey="id" />
 
       <Modal
         title="Update Coursier"
-        visible={isModalVisible}
+        visible={isUpdateModalVisible}
         onOk={handleUpdateSubmit}
-        onCancel={() => setIsModalVisible(false)}
+        onCancel={() => setIsUpdateModalVisible(false)}
         okText="Submit"
         cancelText="Cancel"
       >
@@ -169,6 +228,45 @@ const CoursierList = () => {
           </Form.Item>
           <Form.Item label="Password" name="passwd">
             <Input.Password name="passwd" value={updateData.passwd} onChange={handleUpdateChange} />
+          </Form.Item>
+        </Form>
+      </Modal>
+
+      <Modal
+        title="Add Coursier"
+        visible={isAddModalVisible}
+        onOk={handleAddSubmit}
+        onCancel={() => setIsAddModalVisible(false)}
+        okText="Submit"
+        cancelText="Cancel"
+      >
+        <Form
+          layout="vertical"
+          initialValues={newCoursierData}
+          onValuesChange={(changedValues) => setNewCoursierData((prev) => ({ ...prev, ...changedValues }))}
+        >
+          <Form.Item label="Nom" name="nom">
+            <Input name="nom" value={newCoursierData.nom} onChange={handleAddChange} />
+          </Form.Item>
+          <Form.Item label="Prenom" name="prenom">
+            <Input name="prenom" value={newCoursierData.prenom} onChange={handleAddChange} />
+          </Form.Item>
+          <Form.Item label="Tele" name="tele">
+            <Input name="tele" value={newCoursierData.tele} onChange={handleAddChange} />
+          </Form.Item>
+          <Form.Item label="Email" name="email">
+            <Input name="email" value={newCoursierData.email} onChange={handleAddChange} />
+          </Form.Item>
+          <Form.Item label="Salaire" name="salaire">
+            <InputNumber
+              name="salaire"
+              value={newCoursierData.salaire}
+              onChange={(value) => setNewCoursierData((prev) => ({ ...prev, salaire: value }))}
+              style={{ width: '100%' }}
+            />
+          </Form.Item>
+          <Form.Item label="Password" name="passwd">
+            <Input.Password name="passwd" value={newCoursierData.passwd} onChange={handleAddChange} />
           </Form.Item>
         </Form>
       </Modal>
