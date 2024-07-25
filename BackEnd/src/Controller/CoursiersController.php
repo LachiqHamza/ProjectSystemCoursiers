@@ -103,12 +103,12 @@ class CoursiersController extends AbstractController
         $tele = $data['tele'] ?? null;
         $email = $data['email'] ?? null;
         $password = $data['password'] ?? null;
-        $role = $data['role'] ?? null;
+        //$role = $data['role'] ?? "coursier";
         $cin = $data['Cin'] ?? null;
         $dateIntegration = isset($data['Date_intergration']) ? new \DateTime($data['Date_intergration']) : null;
         $salaire = isset($data['salaire']) ? floatval($data['salaire']) : null;
 
-        if (!$nom || !$prenom || !$tele || !$email || !$password || !$role || !$cin || !$dateIntegration || !$salaire) {
+        if (!$nom || !$prenom || !$tele || !$email || !$password || !$cin || !$dateIntegration || !$salaire) {
             return $this->json(['message' => 'All fields are required'], 400);
         }
 
@@ -128,7 +128,7 @@ class CoursiersController extends AbstractController
 
 
         // Create a new courcier
-        $courcier = new Coursiers($nom, $prenom, $tele, $email, $password, $role, $cin, $dateIntegration, $salaire);
+        $courcier = new Coursiers($nom, $prenom, $tele, $email, $password, "coursier", $cin, $dateIntegration, $salaire);
 
         // Persist the new courcier to the database
         $entityManager->persist($courcier);
