@@ -33,12 +33,7 @@ class DemandeController extends AbstractController
         $this->serializer = $serializer;
     }
 
-    #[Route('/', name: 'get_demandes', methods: ['GET'])]
-    public function getDemandes(): JsonResponse
-    {
-        $demandes = $this->demandeRepository->findAll();
-        return $this->json($demandes);
-    }
+
 
     #[Route('/{id}', name: 'get_demande', methods: ['GET'])]
     public function getDemande(int $id): JsonResponse
@@ -107,6 +102,15 @@ class DemandeController extends AbstractController
 
 
 //**********************************************************************************************************
+    #[Route('/getall', name: 'get_demandes', methods: ['GET'])]
+    public function getDemandes(): JsonResponse
+    {
+        $demandes = $this->demandeRepository->findAll();
+        return $this->json($demandes);
+    }
+//**********************************************************************************************************
+
+//**********************************************************************************************************
     #[Route('/add', name: 'create_demande', methods: ['POST'])]
     public function createDemande(Request $request): JsonResponse
     {
@@ -114,13 +118,13 @@ class DemandeController extends AbstractController
             $data = json_decode($request->getContent(), true);
 
             $client = $this->entityManager->getRepository(Client::class)->find($data['client']['id_client']);
-            $admin = isset($data['$id_admin']['id_admin']) ? $this->entityManager->getRepository(Admin::class)->find($data['$id_admin']['id_admin']) : null;
+            $admin = isset($data['admin']['id_admin']) ? $this->entityManager->getRepository(Admin::class)->find($data['admin']['id_admin']) : null;
             $coursier = isset($data['coursier']['id_coursier']) ? $this->entityManager->getRepository(Coursiers::class)->find($data['coursier']['id_coursier']) : null;
 
             $demande = new Demande();
             $demande->setDescription($data['description']);
             $demande->setClient($client);
-            $demande->setIdAdmin($admin);
+            $demande->setAdmin($admin);
             $demande->setCoursier($coursier);
             $demande->setAdressSource($data['adress_source']);
             $demande->setAdressDest($data['adress_dest']);
@@ -163,10 +167,10 @@ class DemandeController extends AbstractController
             ];
 
 
-            $admin = $demande->getIdAdmin();
+            $admin = $demande->getAdmin();
             if ($admin !== null) {
                 $demandeData['admin'] = [
-                    'id_admin' => $admin->getIdAdmin(),
+                    'id_admin' => $admin->getAdmin(),
                     'admin_name' => $admin->getNom(),
                     'admin_prenom' => $admin->getPrenom(),
                     'admin_telephone' => $admin->getTele(),
@@ -244,7 +248,7 @@ class DemandeController extends AbstractController
                     'client_phone' => $demande->getClient()->getTele(),
                     'client_role' => $demande->getClient()->getRole(),
                 ] : null,
-                'id_admin' => $demande->getIdAdmin() ? $demande->getIdAdmin()->getIdAdmin() : null,
+                'id_admin' => $demande->getAdmin() ? $demande->getAdmin()->getIdAdmin() : null,
                 'coursier' => $demande->getCoursier() ? $demande->getCoursier()->getIdCoursier() : null,
                 'adress_source' => $demande->getAdressSource(),
                 'adress_dest' => $demande->getAdressDest(),
@@ -273,6 +277,62 @@ class DemandeController extends AbstractController
             return $this->json(['count' => $count]);
         } catch (\Exception $e) {
             return $this->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+//*******************************************************************************************************
+
+//*******************************************************************************************************
+    #[Route('/finddemandesbyclient/{id}', name: 'demandes_null_admin_coursier_count', methods: ['GET'])]
+    public function findDemandesByClient(int $id, DemandeRepository $demandeRepository): JsonResponse
+    {
+        try {
+            $demandes = $demandeRepository->findAllDemandesByClient($id);
+
+            if (empty($demandes)) {
+                throw new NotFoundHttpException('No demandes found for the specified client.');
+            }
+
+            $responseData = [];
+
+            foreach ($demandes as $demande) {
+                $demandeData = [
+                    'id_demande' => $demande->getIdDemande(),
+                    'description' => $demande->getDescription(),
+                    'adress_source' => $demande->getAdressSource(),
+                    'adress_dest' => $demande->getAdressDest(),
+                    'poids' => $demande->getPoids(),
+                    'date_demande' => $demande->getDateDemande(),
+                    'status' => $demande->getStatus(),
+                    'date_livraison' => $demande->getDateLivraison(),
+                ];
+
+                $admin = $demande->getAdmin();
+                if ($admin !== null) {
+                    $demandeData['admin'] = [
+                        'id_admin' => $admin->getIdAdmin(),
+                        'admin_name' => $admin->getNom(),
+                    ];
+                } else {
+                    $demandeData['admin'] = null;
+                }
+
+                $coursier = $demande->getCoursier();
+                if ($coursier !== null) {
+                    $demandeData['coursier'] = [
+                        'id_coursier' => $coursier->getIdCoursier(),
+                        'coursier_name' => $coursier->getNom(),
+                    ];
+                } else {
+                    $demandeData['coursier'] = null;
+                }
+
+                $responseData[] = $demandeData;
+            }
+
+            return $this->json($responseData);
+        } catch (\Exception $e) {
+            return $this->json(['error' => $e->getMessage()], Response::HTTP_BAD_REQUEST);
         }
     }
 
