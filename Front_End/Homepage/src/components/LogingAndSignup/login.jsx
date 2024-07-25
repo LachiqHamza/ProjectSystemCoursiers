@@ -18,7 +18,7 @@ const LoginForm = ({ onRegisterClick }) => {
       const user = response.data;
 
       if (user.role === 'client') {
-        navigate('/client-dashboard');
+        navigate('/client');
       } else if (user.role === 'admin') {
         navigate('/admin');
       } else if (user.role === 'coursier') {
