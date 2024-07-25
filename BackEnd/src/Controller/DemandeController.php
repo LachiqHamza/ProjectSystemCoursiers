@@ -8,6 +8,8 @@ use App\Entity\Admin;
 use App\Entity\Coursiers;
 use App\Repository\DemandeRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Monolog\Logger;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -25,12 +27,14 @@ class DemandeController extends AbstractController
     private EntityManagerInterface $entityManager;
     private DemandeRepository $demandeRepository;
     private SerializerInterface $serializer;
+    private LoggerInterface $logger;
 
-    public function __construct(EntityManagerInterface $entityManager, DemandeRepository $demandeRepository, SerializerInterface $serializer)
+    public function __construct(LoggerInterface $logger, EntityManagerInterface $entityManager, DemandeRepository $demandeRepository, SerializerInterface $serializer)
     {
         $this->entityManager = $entityManager;
         $this->demandeRepository = $demandeRepository;
         $this->serializer = $serializer;
+        $this->logger = $logger;
     }
 
 
@@ -117,9 +121,30 @@ class DemandeController extends AbstractController
         try {
             $data = json_decode($request->getContent(), true);
 
+            if (!isset($data['client']['id_client'])) {
+                return $this->json(['message' => 'Client ID is required'], 400);
+            }
+
             $client = $this->entityManager->getRepository(Client::class)->find($data['client']['id_client']);
-            $admin = isset($data['admin']['id_admin']) ? $this->entityManager->getRepository(Admin::class)->find($data['admin']['id_admin']) : null;
-            $coursier = isset($data['coursier']['id_coursier']) ? $this->entityManager->getRepository(Coursiers::class)->find($data['coursier']['id_coursier']) : null;
+            if (!$client) {
+                return $this->json(['message' => 'Invalid Client ID'], 400);
+            }
+
+            $admin = null;
+            if (isset($data['admin']['id_admin'])) {
+                $admin = $this->entityManager->getRepository(Admin::class)->find($data['admin']['id_admin']);
+                if (!$admin) {
+                    return $this->json(['message' => 'Invalid Admin ID'], 400);
+                }
+            }
+
+            $coursier = null;
+            if (isset($data['coursier']['id_coursier'])) {
+                $coursier = $this->entityManager->getRepository(Coursiers::class)->find($data['coursier']['id_coursier']);
+                if (!$coursier) {
+                    return $this->json(['message' => 'Invalid Coursier ID'], 400);
+                }
+            }
 
             $demande = new Demande();
             $demande->setDescription($data['description']);
@@ -131,18 +156,20 @@ class DemandeController extends AbstractController
             $demande->setPoids($data['poids']);
             $demande->setDateDemande(new \DateTime($data['date_demande']));
             $demande->setStatus($data['status'] ?? null);
-            $demande->setDateLivraison($data['date_livraison'] ? new \DateTime($data['date_livraison']) : null);
+            $demande->setDateLivraison(isset($data['date_livraison']) ? new \DateTime($data['date_livraison']) : null);
 
             $this->entityManager->persist($demande);
             $this->entityManager->flush();
 
             return $this->json($demande, 201);
-        } catch (NotEncodableValueException $e) {
-            return $this->json(['message' => 'Invalid JSON format'], 400);
-        } catch (InvalidArgumentException $e) {
-            return $this->json(['message' => 'Invalid data provided'], 400);
+        } catch (\Exception $e) {
+            // Log the exception message
+            $this->logger->error('Error creating demande: ' . $e->getMessage());
+
+            return $this->json(['message' => 'An error occurred while processing your request'], 500);
         }
     }
+
 
 //**********************************************************************************************************
 
