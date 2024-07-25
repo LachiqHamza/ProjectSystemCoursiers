@@ -1,158 +1,116 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Table, Button, Modal, Form, Input, InputNumber, Popconfirm } from 'antd';
+import { Table, Button, Modal, Form, Input, InputNumber, notification, DatePicker, Card, Col, Row } from 'antd';
+import { EditOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons';
 
 const CoursierList = () => {
-  const [coursiers, setCoursiers] = useState([]);
-  const [selectedCoursier, setSelectedCoursier] = useState(null);
-  const [updateData, setUpdateData] = useState({
-    nom: '',
-    prenom: '',
-    tele: '',
-    salaire: '',
-    passwd: ''
-  });
-  const [newCoursierData, setNewCoursierData] = useState({
-    nom: '',
-    prenom: '',
-    tele: '',
-    email: '',
-    salaire: '',
-    passwd: ''
-  });
-  const [isUpdateModalVisible, setIsUpdateModalVisible] = useState(false);
+  const [courciers, setCourciers] = useState([]);
+  const [isEditModalVisible, setIsEditModalVisible] = useState(false);
   const [isAddModalVisible, setIsAddModalVisible] = useState(false);
+  const [currentCoursier, setCurrentCoursier] = useState(null);
+  const [form] = Form.useForm();
 
   useEffect(() => {
-    const fetchCoursiers = async () => {
-      try {
-        const response = await axios.get('http://localhost:8000/api/courciers/all');
-        setCoursiers(response.data);
-      } catch (error) {
-        console.error('Error fetching coursiers:', error);
-      }
-    };
-    fetchCoursiers();
+    fetchCourciers();
   }, []);
 
-  const showUpdateModal = (coursier) => {
-    setSelectedCoursier(coursier);
-    setUpdateData({
-      nom: coursier.name || '',
-      prenom: coursier.lastname || '',
-      tele: coursier.tele || '',
-      salaire: coursier.salaire || '',
-      passwd: ''
-    });
-    setIsUpdateModalVisible(true);
-  };
-
-  const handleUpdateChange = (e) => {
-    const { name, value } = e.target;
-    setUpdateData((prevData) => ({
-      ...prevData,
-      [name]: value
-    }));
-  };
-
-  const handleUpdateSubmit = async () => {
-    if (selectedCoursier) {
-      try {
-        await axios.put(`http://localhost:8000/api/courciers/${selectedCoursier.id}/update`, {
-          nom: updateData.nom,
-          prenom: updateData.prenom,
-          tele: updateData.tele,
-          salaire: updateData.salaire,
-          passwd: updateData.passwd
-        });
-
-        const response = await axios.get('http://localhost:8000/api/courciers/all');
-        setCoursiers(response.data);
-        setIsUpdateModalVisible(false);
-        setSelectedCoursier(null);
-        setUpdateData({
-          nom: '',
-          prenom: '',
-          tele: '',
-          salaire: '',
-          passwd: ''
-        });
-      } catch (error) {
-        console.error('Error updating coursier:', error);
-      }
+  const fetchCourciers = async () => {
+    try {
+      const response = await axios.get('http://localhost:8000/api/courciers/all');
+      setCourciers(response.data);
+    } catch (error) {
+      console.error('Error fetching courciers:', error);
     }
   };
 
-  const showAddModal = () => {
-    setNewCoursierData({
-      nom: '',
-      prenom: '',
-      tele: '',
-      email: '',
-      salaire: '',
-      passwd: ''
+  const handleEdit = (coursier) => {
+    setCurrentCoursier(coursier);
+    form.setFieldsValue({
+      nom: coursier.nom,
+      prenom: coursier.prenom,
+      tele: coursier.tele,
+      email: coursier.email,
+      salaire: coursier.salaire,
+      password: '', // Clear the password field
     });
-    setIsAddModalVisible(true);
+    setIsEditModalVisible(true);
   };
 
-  const handleAddChange = (e) => {
-    const { name, value } = e.target;
-    setNewCoursierData((prevData) => ({
-      ...prevData,
-      [name]: value
-    }));
-  };
-
-  const handleAddSubmit = async () => {
+  const handleAdd = async () => {
     try {
+      const values = form.getFieldsValue();
       await axios.post('http://localhost:8000/api/courciers/add', {
-        nom: newCoursierData.nom,
-        prenom: newCoursierData.prenom,
-        tele: newCoursierData.tele,
-        email: newCoursierData.email,
-        salaire: newCoursierData.salaire,
-        passwd: newCoursierData.passwd
+        nom: values.nom,
+        prenom: values.prenom,
+        tele: values.tele,
+        email: values.email,
+        password: values.password,
+        role: values.role,
+        Cin: values.Cin,
+        Date_intergration: values.Date_intergration.format('YYYY-MM-DD'),
+        salaire: values.salaire,
       });
-
-      const response = await axios.get('http://localhost:8000/api/courciers/all');
-      setCoursiers(response.data);
+      notification.success({
+        message: 'Success',
+        description: 'Coursier added successfully.',
+        icon: <PlusOutlined style={{ color: 'green' }} />,
+      });
+      fetchCourciers(); // Refresh the list
       setIsAddModalVisible(false);
-      setNewCoursierData({
-        nom: '',
-        prenom: '',
-        tele: '',
-        email: '',
-        salaire: '',
-        passwd: ''
-      });
     } catch (error) {
-      console.error('Error adding coursier:', error);
+      console.error('Error adding courcier:', error);
+    }
+  };
+
+  const handleUpdate = async () => {
+    try {
+      const values = form.getFieldsValue();
+      await axios.put(`http://localhost:8000/api/courciers/${currentCoursier.id}/update`, {
+        nom: values.nom,
+        prenom: values.prenom,
+        tele: values.tele,
+        salaire: values.salaire,
+        passwd: values.password, // Update password if provided
+      });
+      notification.success({
+        message: 'Success',
+        description: 'Coursier updated successfully.',
+        icon: <EditOutlined style={{ color: 'green' }} />,
+      });
+      fetchCourciers(); // Refresh the list
+      setIsEditModalVisible(false);
+    } catch (error) {
+      console.error('Error updating courcier:', error);
     }
   };
 
   const handleDelete = async (id) => {
     try {
       await axios.delete(`http://localhost:8000/api/courciers/${id}`);
-      const response = await axios.get('http://localhost:8000/api/courciers/all');
-      setCoursiers(response.data);
+      notification.success({
+        message: 'Success',
+        description: 'Coursier deleted successfully.',
+        icon: <DeleteOutlined style={{ color: 'red' }} />,
+      });
+      fetchCourciers(); // Refresh the list
     } catch (error) {
-      console.error('Error deleting coursier:', error);
+      console.error('Error deleting courcier:', error);
     }
   };
 
   const columns = [
     {
       title: 'Nom',
-      dataIndex: 'name',
-      key: 'name',
+      dataIndex: 'nom',
+      key: 'nom',
     },
     {
-      title: 'Prenom',
-      dataIndex: 'lastname',
-      key: 'lastname',
+      title: 'Prénom',
+      dataIndex: 'prenom',
+      key: 'prenom',
     },
     {
-      title: 'Tele',
+      title: 'Téléphone',
       dataIndex: 'tele',
       key: 'tele',
     },
@@ -165,108 +123,126 @@ const CoursierList = () => {
       title: 'Salaire',
       dataIndex: 'salaire',
       key: 'salaire',
-      render: (text) => <span>${text}</span>,
     },
     {
-      title: 'Action',
-      key: 'action',
-      render: (_, record) => (
-        <div>
-          <Button onClick={() => showUpdateModal(record)} type="primary" style={{ marginRight: 8 }}>
-            Update
-          </Button>
-          <Popconfirm
-            title="Are you sure to delete this coursier?"
-            onConfirm={() => handleDelete(record.id)}
-            okText="Yes"
-            cancelText="No"
-          >
-            <Button type="danger">Delete</Button>
-          </Popconfirm>
+      title: 'Actions',
+      key: 'actions',
+      render: (text, record) => (
+        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+          <Button
+            icon={<EditOutlined />}
+            onClick={() => handleEdit(record)}
+            style={{ marginRight: 8 }}
+            type="primary"
+          />
+          <Button
+            icon={<DeleteOutlined />}
+            onClick={() => handleDelete(record.id)}
+            type="danger"
+          />
         </div>
       ),
     },
   ];
 
   return (
-    <div style={{ padding: '24px' }}>
-      <h1>Coursier List</h1>
-      <Button type="primary" onClick={showAddModal} style={{ marginBottom: 16 }}>
+    <div style={{ padding: '24px', background: '#fff' }}>
+      <Button
+        type="primary"
+        icon={<PlusOutlined />}
+        onClick={() => setIsAddModalVisible(true)}
+        style={{ marginBottom: 16 }}
+      >
         Add Coursier
       </Button>
-      <Table dataSource={coursiers} columns={columns} rowKey="id" />
+      <Table
+        columns={columns}
+        dataSource={courciers}
+        rowKey="id"
+        bordered
+        pagination={{ pageSize: 10 }}
+        scroll={{ x: 'max-content' }}
+      />
 
       <Modal
-        title="Update Coursier"
-        visible={isUpdateModalVisible}
-        onOk={handleUpdateSubmit}
-        onCancel={() => setIsUpdateModalVisible(false)}
-        okText="Submit"
+        title="Add Coursier"
+        visible={isAddModalVisible}
+        onOk={handleAdd}
+        onCancel={() => setIsAddModalVisible(false)}
+        okText="Add"
         cancelText="Cancel"
+        centered
       >
-        <Form
-          layout="vertical"
-          initialValues={updateData}
-          onValuesChange={(changedValues) => setUpdateData((prev) => ({ ...prev, ...changedValues }))}
-        >
-          <Form.Item label="Nom" name="nom">
-            <Input name="nom" value={updateData.nom} onChange={handleUpdateChange} />
+        <Form form={form} layout="vertical">
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item label="Nom" name="nom" rules={[{ required: true, message: 'Please enter the nom!' }]}>
+                <Input />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item label="Prénom" name="prenom" rules={[{ required: true, message: 'Please enter the prénom!' }]}>
+                <Input />
+              </Form.Item>
+            </Col>
+          </Row>
+          <Form.Item label="Téléphone" name="tele" rules={[{ required: true, message: 'Please enter the telephone!' }]}>
+            <Input />
           </Form.Item>
-          <Form.Item label="Prenom" name="prenom">
-            <Input name="prenom" value={updateData.prenom} onChange={handleUpdateChange} />
+          <Form.Item label="Email" name="email" rules={[{ required: true, message: 'Please enter the email!' }]}>
+            <Input />
           </Form.Item>
-          <Form.Item label="Tele" name="tele">
-            <Input name="tele" value={updateData.tele} onChange={handleUpdateChange} />
+          <Form.Item label="Password" name="password" rules={[{ required: true, message: 'Please enter the password!' }]}>
+            <Input.Password />
           </Form.Item>
-          <Form.Item label="Salaire" name="salaire">
-            <InputNumber
-              name="salaire"
-              value={updateData.salaire}
-              onChange={(value) => setUpdateData((prev) => ({ ...prev, salaire: value }))}
-              style={{ width: '100%' }}
-            />
+          <Form.Item label="Role" name="role" rules={[{ required: true, message: 'Please enter the role!' }]}>
+            <Input />
           </Form.Item>
-          <Form.Item label="Password" name="passwd">
-            <Input.Password name="passwd" value={updateData.passwd} onChange={handleUpdateChange} />
+          <Form.Item label="Cin" name="Cin" rules={[{ required: true, message: 'Please enter the Cin!' }]}>
+            <Input />
+          </Form.Item>
+          <Form.Item label="Date Integration" name="Date_intergration" rules={[{ required: true, message: 'Please select the date!' }]}>
+            <DatePicker style={{ width: '100%' }} />
+          </Form.Item>
+          <Form.Item label="Salaire" name="salaire" rules={[{ required: true, message: 'Please enter the salary!' }]}>
+            <InputNumber style={{ width: '100%' }} />
           </Form.Item>
         </Form>
       </Modal>
 
       <Modal
-        title="Add Coursier"
-        visible={isAddModalVisible}
-        onOk={handleAddSubmit}
-        onCancel={() => setIsAddModalVisible(false)}
-        okText="Submit"
+        title="Update Coursier"
+        visible={isEditModalVisible}
+        onOk={handleUpdate}
+        onCancel={() => setIsEditModalVisible(false)}
+        okText="Update"
         cancelText="Cancel"
+        centered
       >
-        <Form
-          layout="vertical"
-          initialValues={newCoursierData}
-          onValuesChange={(changedValues) => setNewCoursierData((prev) => ({ ...prev, ...changedValues }))}
-        >
-          <Form.Item label="Nom" name="nom">
-            <Input name="nom" value={newCoursierData.nom} onChange={handleAddChange} />
-          </Form.Item>
-          <Form.Item label="Prenom" name="prenom">
-            <Input name="prenom" value={newCoursierData.prenom} onChange={handleAddChange} />
-          </Form.Item>
-          <Form.Item label="Tele" name="tele">
-            <Input name="tele" value={newCoursierData.tele} onChange={handleAddChange} />
+        <Form form={form} layout="vertical">
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item label="Nom" name="nom" rules={[{ required: true, message: 'Please enter the nom!' }]}>
+                <Input />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item label="Prénom" name="prenom" rules={[{ required: true, message: 'Please enter the prénom!' }]}>
+                <Input />
+              </Form.Item>
+            </Col>
+          </Row>
+          <Form.Item label="Téléphone" name="tele" rules={[{ required: true, message: 'Please enter the telephone!' }]}>
+            <Input />
           </Form.Item>
           <Form.Item label="Email" name="email">
-            <Input name="email" value={newCoursierData.email} onChange={handleAddChange} />
+            <Input disabled />
+          </Form.Item>
+          <Form.Item label="Password" name="password">
+            <Input.Password />
           </Form.Item>
           <Form.Item label="Salaire" name="salaire">
-            <InputNumber
-              name="salaire"
-              value={newCoursierData.salaire}
-              onChange={(value) => setNewCoursierData((prev) => ({ ...prev, salaire: value }))}
-              style={{ width: '100%' }}
-            />
-          </Form.Item>
-          <Form.Item label="Password" name="passwd">
-            <Input.Password name="passwd" value={newCoursierData.passwd} onChange={handleAddChange} />
+            <InputNumber style={{ width: '100%' }} />
           </Form.Item>
         </Form>
       </Modal>

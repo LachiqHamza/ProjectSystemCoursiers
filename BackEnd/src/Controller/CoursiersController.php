@@ -15,7 +15,7 @@ use Symfony\Component\Serializer\SerializerInterface;
 
 class CoursiersController extends AbstractController
 {
-    #[Route('/api/coursiers', name: 'get_coursiers', methods: ['GET'])]
+    #[Route('/api/coursiers ', name: 'get_coursiers', methods: ['GET'])]
     public function getCoursiers(CoursiersRepository $coursiersRepository): JsonResponse
     {
         $coursiers = $coursiersRepository->findAll();
