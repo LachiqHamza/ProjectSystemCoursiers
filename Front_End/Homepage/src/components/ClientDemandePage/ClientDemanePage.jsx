@@ -1,163 +1,192 @@
-import React, { useState, useEffect } from 'react';
-import { Card, Row, Col, Typography, Space, Button, Modal, Form, Input, DatePicker, message } from 'antd';
-import { CheckCircleOutlined, ClockCircleOutlined } from '@ant-design/icons';
-import DemandeService from './DemandeService';
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
+import { Button, Card, Form, Input, DatePicker, message, Modal } from 'antd';
 import moment from 'moment';
+import { CheckCircleOutlined, CloseCircleOutlined, ClockCircleOutlined } from '@ant-design/icons'; // Import icons
 
-const { Title, Text } = Typography;
-
-const ClientDemanePage = () => {
+const ClientDemandePage = () => {
   const [demandes, setDemandes] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [isModalVisible, setIsModalVisible] = useState(false);
-  const [selectedDemande, setSelectedDemande] = useState(null);
+  const [showForm, setShowForm] = useState(false);
   const [form] = Form.useForm();
+  const [clientId, setClientId] = useState(null);
 
   useEffect(() => {
-    fetchDemandes();
+    // Retrieve client ID from local storage
+    const storedClientId = localStorage.getItem('clientId');
+    if (storedClientId) {
+      setClientId(storedClientId);
+    }
   }, []);
 
-  const fetchDemandes = async () => {
-    setLoading(true);
-    try {
-      const response = await DemandeService.getAllDemandes();
-      setDemandes(response.data);
-    } catch (error) {
-      console.error('Failed to fetch demandes', error);
-      message.error('Failed to fetch demandes');
-    } finally {
-      setLoading(false);
+  useEffect(() => {
+    if (clientId) {
+      axios.get(`http://127.0.0.1:8000/api/demandes/finddemandesbyclient/${clientId}`)
+        .then(response => {
+          setDemandes(response.data);
+        })
+        .catch(error => {
+          console.error('Error fetching demandes:', error);
+        });
     }
-  };
+  }, [clientId]);
 
-  const handleEdit = (demande) => {
-    setSelectedDemande(demande);
-    form.setFieldsValue({
-      description: demande.description,
-      adress_source: demande.adress_source,
-      adress_dest: demande.adress_dest,
-      poids: demande.poids,
-      date_demande: demande.date_demande ? moment(demande.date_demande) : null,
-      date_livraison: demande.date_livraison ? moment(demande.date_livraison) : null,
-    });
-    setIsModalVisible(true);
-  };
-
-  const handleDelete = async (id) => {
-    try {
-      await DemandeService.deleteDemande(id);
-      fetchDemandes();
-    } catch (error) {
-      console.error('Failed to delete demande', error);
-      message.error('Failed to delete demande');
-    }
-  };
-
-  const handleModalOk = async () => {
-    try {
-      const values = await form.validateFields();
-      if (selectedDemande) {
-        await DemandeService.updateDemande(selectedDemande.id_demande, values);
-        message.success('Demande updated successfully');
-      } else {
-        await DemandeService.createDemande({ ...values, status: 'pending' });
-        message.success('Demande created successfully');
+  const handleFormSubmit = (values) => {
+    const newDemande = {
+      description: values.description,
+      adress_source: values.adress_source,
+      adress_dest: values.adress_dest,
+      poids: values.poids,
+      date_demande: values.date_demande.format('YYYY-MM-DD'),
+      status: null, // Explicitly set as null
+      date_livraison: null, // Explicitly set as null
+      client: {
+        id_client: clientId
+      },
+      admin: {
+        id_admin: null // Explicitly set as null
+      },
+      coursier: {
+        id_coursier: null // Explicitly set as null
       }
-      setIsModalVisible(false);
-      fetchDemandes();
-      form.resetFields();
-      setSelectedDemande(null);
-    } catch (error) {
-      console.error('Failed to save demande', error);
-      message.error('Failed to save demande');
+    };
+
+    axios.post('http://127.0.0.1:8000/api/demandes/add', newDemande)
+      .then(response => {
+        message.success('Demande added successfully');
+        setDemandes([...demandes, response.data]);
+        setShowForm(false);
+        form.resetFields();
+      })
+      .catch(error => {
+        message.error('Error adding demande');
+        console.error('Error:', error);
+      });
+  };
+
+  // Inline styles
+  const styles = {
+    clientIdDisplay: {
+      position: 'fixed',
+      top: '10px',
+      right: '10px',
+      backgroundColor: '#f0f2f5',
+      padding: '10px',
+      borderRadius: '5px',
+      boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+      fontSize: '16px'
+    },
+    demandeList: {
+      marginTop: '20px',
+      display: 'flex',
+      flexWrap: 'wrap',
+      gap: '16px'
+    },
+    card: {
+      width: '300px',
+      border: '1px solid #d9d9d9',
+      borderRadius: '4px',
+      boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)'
+    },
+    statusIcon: {
+      fontSize: '20px',
+      marginRight: '8px'
     }
   };
 
-  const handleModalCancel = () => {
-    setIsModalVisible(false);
-    form.resetFields();
-    setSelectedDemande(null);
+  const getStatusIcon = (status) => {
+    switch (status) {
+      case 'Completed':
+        return <CheckCircleOutlined style={styles.statusIcon} />;
+      case 'Cancelled':
+        return <CloseCircleOutlined style={styles.statusIcon} />;
+      case 'Pending':
+        return <ClockCircleOutlined style={styles.statusIcon} />;
+      default:
+        return null;
+    }
   };
 
   return (
-    <div style={{ padding: '20px' }}>
-      <Title level={2}>Client Demandes</Title>
-      <Button type="primary" onClick={() => setIsModalVisible(true)} style={{ marginBottom: '20px' }}>
-        Add Demande
+    <div>
+      <Button type="primary" onClick={() => setShowForm(true)}>
+        Add New Demande
       </Button>
-      <Row gutter={[16, 16]}>
-        {demandes.map((demande) => (
-          <Col xs={24} sm={12} md={8} lg={6} key={demande.id_demande}>
-            <Card
-              title={
-                <span>
-                  Demande +{demande.id_demande}
-                  {demande.status === 'completed' ? (
-                    <CheckCircleOutlined style={{ color: 'green', marginLeft: '10px' }} />
-                  ) : (
-                    <ClockCircleOutlined style={{ color: 'orange', marginLeft: '10px' }} />
-                  )}
-                </span>
-              }
-              bordered={false}
-            >
-              <Space direction="vertical">
-                <Text strong>Description:</Text>
-                <Text>{demande.description}</Text>
-                <Text strong>Address Source:</Text>
-                <Text>{demande.adress_source}</Text>
-                <Text strong>Address Destination:</Text>
-                <Text>{demande.adress_dest}</Text>
-                <Text strong>Weight:</Text>
-                <Text>{demande.poids}</Text>
-                <Text strong>Date Demande:</Text>
-                <Text>{moment(demande.date_demande).format('YYYY-MM-DD')}</Text>
-                <Text strong>Date Livraison:</Text>
-                <Text>{demande.date_livraison ? moment(demande.date_livraison).format('YYYY-MM-DD') : 'N/A'}</Text>
-                <Space>
-                  <Button type="primary" onClick={() => handleEdit(demande)}>Edit</Button>
-                  <Button danger onClick={() => handleDelete(demande.id_demande)}>Delete</Button>
-                </Space>
-              </Space>
-            </Card>
-          </Col>
-        ))}
-      </Row>
-
       <Modal
-        title={selectedDemande ? 'Edit Demande' : 'Add Demande'}
-        visible={isModalVisible}
-        onOk={handleModalOk}
-        onCancel={handleModalCancel}
-        okText="Save"
+        title="Add New Demande"
+        visible={showForm}
+        onCancel={() => setShowForm(false)}
+        footer={null}
       >
-        <Form form={form} layout="vertical">
+        <Form
+          form={form}
+          onFinish={handleFormSubmit}
+          layout="vertical"
+        >
           <Form.Item
             name="description"
             label="Description"
-            rules={[{ required: true, message: 'Please input the description' }]}
+            rules={[{ required: true, message: 'Please input the description!' }]}
           >
             <Input />
           </Form.Item>
-          <Form.Item name="adress_source" label="Address Source">
+          <Form.Item
+            name="adress_source"
+            label="Address Source"
+            rules={[{ required: true, message: 'Please input the address source!' }]}
+          >
             <Input />
           </Form.Item>
-          <Form.Item name="adress_dest" label="Address Destination">
+          <Form.Item
+            name="adress_dest"
+            label="Address Destination"
+            rules={[{ required: true, message: 'Please input the address destination!' }]}
+          >
             <Input />
           </Form.Item>
-          <Form.Item name="poids" label="Weight">
-            <Input type="number" />
+          <Form.Item
+            name="poids"
+            label="Weight"
+            rules={[{ required: true, message: 'Please input the weight!' }]}
+          >
+            <Input type="number" step="0.1" />
           </Form.Item>
-          <Form.Item name="date_demande" label="Request Date">
-            <DatePicker />
+          <Form.Item
+            name="date_demande"
+            label="Date of Request"
+            rules={[{ required: true, message: 'Please select the date of request!' }]}
+          >
+            <DatePicker format="YYYY-MM-DD" />
           </Form.Item>
-          <Form.Item name="date_livraison" label="Delivery Date">
-            <DatePicker />
+          {/* Status and Delivery Date fields are removed from the form */}
+          <Form.Item>
+            <Button type="primary" htmlType="submit">
+              Submit
+            </Button>
           </Form.Item>
         </Form>
       </Modal>
+      <div style={styles.demandeList}>
+        {demandes.map(demande => (
+          <Card key={demande.id_demande} style={styles.card}>
+            <Card.Meta
+              title={`Demande ID: ${demande.id_demande}`}
+              description={
+                <>
+                  <p><strong>Description:</strong> {demande.description}</p>
+                  <p><strong>Address Source:</strong> {demande.adress_source}</p>
+                  <p><strong>Address Destination:</strong> {demande.adress_dest}</p>
+                  <p><strong>Weight:</strong> {demande.poids}</p>
+                  <p><strong>Date of Request:</strong> {moment(demande.date_demande).format('YYYY-MM-DD')}</p>
+                  <p><strong>Status:</strong> {getStatusIcon(demande.status)} {demande.status || 'N/A'}</p>
+                  <p><strong>Delivery Date:</strong> {demande.date_livraison ? moment(demande.date_livraison).format('YYYY-MM-DD') : 'N/A'}</p>
+                </>
+              }
+            />
+          </Card>
+        ))}
+      </div>
     </div>
   );
 };
 
-export default ClientDemanePage;
+export default ClientDemandePage;

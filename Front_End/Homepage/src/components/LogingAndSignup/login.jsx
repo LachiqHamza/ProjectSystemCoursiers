@@ -1,6 +1,6 @@
 import React from 'react';
 import { LockOutlined, UserOutlined } from '@ant-design/icons';
-import { Button, Checkbox, Form, Input } from 'antd';
+import { Button, Form, Input, message } from 'antd';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import styles from './login.css'; // Adjust the path as per your file location
@@ -10,25 +10,34 @@ const LoginForm = ({ onRegisterClick }) => {
 
   const onFinish = async (values) => {
     try {
+      // Sending login request
       const response = await axios.post('http://127.0.0.1:8000/api/login', {
         email: values.username,
         password: values.password,
       });
-
-      const user = response.data;
-
-      if (user.role === 'client') {
+  
+      const { token, role, id } = response.data;
+  
+      // Store token and client ID in local storage
+      localStorage.setItem('token', token);
+      localStorage.setItem('clientId', id);
+  
+      // Navigate based on user role
+      if (role === 'client') {
         navigate('/client');
-      } else if (user.role === 'admin') {
+      } else if (role === 'admin') {
         navigate('/admin');
-      } else if (user.role === 'coursier') {
+      } else if (role === 'coursier') {
         navigate('/coursier-dashboard');
+      } else {
+        message.error('Unknown role');
       }
     } catch (error) {
       console.error('Error during login:', error);
-      alert('Invalid email or password');
+      message.error('Invalid email or password');
     }
   };
+  
 
   return (
     <div className={styles['login-form-wrapper']}>
@@ -67,13 +76,12 @@ const LoginForm = ({ onRegisterClick }) => {
           />
         </Form.Item>
         <Form.Item>
-          <Form.Item name="remember" valuePropName="checked" noStyle>
-            <Checkbox>Remember me</Checkbox>
-          </Form.Item>
-
-          <a className={styles['login-form-forgot']} href="">
-            Forgot password
-          </a>
+          <div>
+            <label htmlFor="remember_me">
+              <input type="checkbox" id="remember_me" name="_remember_me" />
+              Remember me
+            </label>
+          </div>
         </Form.Item>
 
         <Form.Item>
