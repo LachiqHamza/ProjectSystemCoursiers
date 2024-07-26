@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Button, Card, Form, Input, DatePicker, message, Modal } from 'antd';
 import moment from 'moment';
-import { CheckCircleOutlined, CloseCircleOutlined, ClockCircleOutlined } from '@ant-design/icons'; // Import icons
+import { CheckCircleOutlined, CloseCircleOutlined, ClockCircleOutlined, PlusCircleOutlined, HomeOutlined, EnvironmentOutlined, CalendarOutlined, EditOutlined, DashboardOutlined } from '@ant-design/icons';
 
 const ClientDemandePage = () => {
   const [demandes, setDemandes] = useState([]);
@@ -11,7 +11,6 @@ const ClientDemandePage = () => {
   const [clientId, setClientId] = useState(null);
 
   useEffect(() => {
-    // Retrieve client ID from local storage
     const storedClientId = localStorage.getItem('clientId');
     if (storedClientId) {
       setClientId(storedClientId);
@@ -37,17 +36,11 @@ const ClientDemandePage = () => {
       adress_dest: values.adress_dest,
       poids: values.poids,
       date_demande: values.date_demande.format('YYYY-MM-DD'),
-      status: null, // Explicitly set as null
-      date_livraison: null, // Explicitly set as null
-      client: {
-        id_client: clientId
-      },
-      admin: {
-        id_admin: null // Explicitly set as null
-      },
-      coursier: {
-        id_coursier: null // Explicitly set as null
-      }
+      status: null,
+      date_livraison: null,
+      client: { id_client: clientId },
+      admin: { id_admin: null },
+      coursier: { id_coursier: null }
     };
 
     axios.post('http://127.0.0.1:8000/api/demandes/add', newDemande)
@@ -63,20 +56,30 @@ const ClientDemandePage = () => {
       });
   };
 
-  // Inline styles
   const styles = {
-    clientIdDisplay: {
-      position: 'fixed',
-      top: '10px',
-      right: '10px',
-      backgroundColor: '#f0f2f5',
-      padding: '10px',
+    container: {
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      padding: '20px'
+    },
+    addButton: {
+      marginBottom: '20px',
+      backgroundColor: '#4CAF50',
+      color: '#fff',
+      border: 'none',
       borderRadius: '5px',
-      boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
-      fontSize: '16px'
+      padding: '10px 20px',
+      fontSize: '16px',
+      cursor: 'pointer',
+      transition: 'background-color 0.3s ease',
+      display: 'flex',
+      alignItems: 'center'
+    },
+    addButtonIcon: {
+      marginRight: '8px'
     },
     demandeList: {
-      marginTop: '20px',
       display: 'flex',
       flexWrap: 'wrap',
       gap: '16px'
@@ -85,31 +88,58 @@ const ClientDemandePage = () => {
       width: '300px',
       border: '1px solid #d9d9d9',
       borderRadius: '4px',
-      boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)'
+      boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+      backgroundColor: '#ffffff',
+      transition: 'transform 0.3s ease',
+      padding: '15px',
+      fontFamily: 'Arial, sans-serif',
+      '&:hover': {
+        transform: 'scale(1.05)'
+      }
     },
     statusIcon: {
       fontSize: '20px',
       marginRight: '8px'
+    },
+    cardTitle: {
+      fontSize: '18px',
+      fontWeight: 'bold',
+      marginBottom: '10px',
+      display: 'flex',
+      alignItems: 'center'
+    },
+    cardDetail: {
+      marginBottom: '10px',
+      display: 'flex',
+      alignItems: 'center',
+      fontWeight: 'bold' // Adjust the font weight here
+    },
+    cardIcon: {
+      marginRight: '8px'
+    },
+    cardValue: {
+      fontWeight: 'normal', // Ensure the values have normal font weight
+      marginLeft: '8px'
     }
   };
 
   const getStatusIcon = (status) => {
     switch (status) {
       case 'Completed':
-        return <CheckCircleOutlined style={styles.statusIcon} />;
+        return <CheckCircleOutlined style={{ ...styles.statusIcon, color: 'green' }} />;
       case 'Cancelled':
-        return <CloseCircleOutlined style={styles.statusIcon} />;
+        return <CloseCircleOutlined style={{ ...styles.statusIcon, color: 'red' }} />;
       case 'Pending':
-        return <ClockCircleOutlined style={styles.statusIcon} />;
+        return <ClockCircleOutlined style={{ ...styles.statusIcon, color: 'orange' }} />;
       default:
         return null;
     }
   };
 
   return (
-    <div>
-      <Button type="primary" onClick={() => setShowForm(true)}>
-        Add New Demande
+    <div style={styles.container}>
+      <Button type="primary" style={styles.addButton} onClick={() => setShowForm(true)}>
+        <PlusCircleOutlined style={styles.addButtonIcon} /> Add New Demande
       </Button>
       <Modal
         title="Add New Demande"
@@ -124,40 +154,39 @@ const ClientDemandePage = () => {
         >
           <Form.Item
             name="description"
-            label="Description"
+            label={<span><EditOutlined /> Description</span>}
             rules={[{ required: true, message: 'Please input the description!' }]}
           >
             <Input />
           </Form.Item>
           <Form.Item
             name="adress_source"
-            label="Address Source"
+            label={<span><HomeOutlined /> Address Source</span>}
             rules={[{ required: true, message: 'Please input the address source!' }]}
           >
             <Input />
           </Form.Item>
           <Form.Item
             name="adress_dest"
-            label="Address Destination"
+            label={<span><EnvironmentOutlined /> Address Destination</span>}
             rules={[{ required: true, message: 'Please input the address destination!' }]}
           >
             <Input />
           </Form.Item>
           <Form.Item
             name="poids"
-            label="Weight"
+            label={<span><DashboardOutlined /> Weight</span>}
             rules={[{ required: true, message: 'Please input the weight!' }]}
           >
             <Input type="number" step="0.1" />
           </Form.Item>
           <Form.Item
             name="date_demande"
-            label="Date of Request"
+            label={<span><CalendarOutlined /> Date of Request</span>}
             rules={[{ required: true, message: 'Please select the date of request!' }]}
           >
             <DatePicker format="YYYY-MM-DD" />
           </Form.Item>
-          {/* Status and Delivery Date fields are removed from the form */}
           <Form.Item>
             <Button type="primary" htmlType="submit">
               Submit
@@ -168,20 +197,30 @@ const ClientDemandePage = () => {
       <div style={styles.demandeList}>
         {demandes.map(demande => (
           <Card key={demande.id_demande} style={styles.card}>
-            <Card.Meta
-              title={`Demande ID: ${demande.id_demande}`}
-              description={
-                <>
-                  <p><strong>Description:</strong> {demande.description}</p>
-                  <p><strong>Address Source:</strong> {demande.adress_source}</p>
-                  <p><strong>Address Destination:</strong> {demande.adress_dest}</p>
-                  <p><strong>Weight:</strong> {demande.poids}</p>
-                  <p><strong>Date of Request:</strong> {moment(demande.date_demande).format('YYYY-MM-DD')}</p>
-                  <p><strong>Status:</strong> {getStatusIcon(demande.status)} {demande.status || 'N/A'}</p>
-                  <p><strong>Delivery Date:</strong> {demande.date_livraison ? moment(demande.date_livraison).format('YYYY-MM-DD') : 'N/A'}</p>
-                </>
-              }
-            />
+            <div style={styles.cardTitle}>
+              <EditOutlined style={styles.cardIcon} /> Demande ID: <span style={styles.cardValue}>{demande.id_demande}</span>
+            </div>
+            <div style={styles.cardDetail}>
+              <EditOutlined style={styles.cardIcon} /> Description: <span style={styles.cardValue}>{demande.description}</span>
+            </div>
+            <div style={styles.cardDetail}>
+              <HomeOutlined style={styles.cardIcon} /> Address Source: <span style={styles.cardValue}>{demande.adress_source}</span>
+            </div>
+            <div style={styles.cardDetail}>
+              <EnvironmentOutlined style={styles.cardIcon} /> Address Destination: <span style={styles.cardValue}>{demande.adress_dest}</span>
+            </div>
+            <div style={styles.cardDetail}>
+              <DashboardOutlined style={styles.cardIcon} /> Weight: <span style={styles.cardValue}>{demande.poids}</span>
+            </div>
+            <div style={styles.cardDetail}>
+              <CalendarOutlined style={styles.cardIcon} /> Date of Request: <span style={styles.cardValue}>{moment(demande.date_demande).format('YYYY-MM-DD')}</span>
+            </div>
+            <div style={styles.cardDetail}>
+              <ClockCircleOutlined style={styles.cardIcon} /> Status: {getStatusIcon(demande.status)} <span style={styles.cardValue}>{demande.status || 'N/A'}</span>
+            </div>
+            <div style={styles.cardDetail}>
+              <CalendarOutlined style={styles.cardIcon} /> Delivery Date: <span style={styles.cardValue}>{demande.date_livraison ? moment(demande.date_livraison).format('YYYY-MM-DD') : 'N/A'}</span>
+            </div>
           </Card>
         ))}
       </div>
