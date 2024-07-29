@@ -51,8 +51,11 @@ const CoursierList = () => {
       nom: values.nom,
       prenom: values.prenom,
       tele: values.tele,
+      email: values.email,
+      cin: values.Cin,
+      Date_intergration: values.Date_intergration.format('YYYY-MM-DD'),
       salaire: values.salaire,
-      passwd: values.password,
+      password: values.password,
     };
 
     try {
@@ -90,8 +93,14 @@ const CoursierList = () => {
   const showModal = (courcier = null) => {
     if (courcier) {
       const formattedCourcier = {
-        ...courcier,
-        Date_intergration: courcier.Date_intergration ? moment(courcier.Date_intergration) : null,
+        nom: courcier.name,
+        prenom: courcier.lastname,
+        tele: courcier.tele,
+        email: courcier.email,
+        Cin: courcier.cin,
+        Date_intergration: courcier.datedintegration ? moment(courcier.datedintegration) : null,
+        salaire: courcier.salaire,
+        password: '', // Ensure the password field is empty
       };
       form.setFieldsValue(formattedCourcier);
       setEditingCourcier(courcier);
