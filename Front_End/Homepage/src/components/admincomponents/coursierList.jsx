@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Table, Button, Modal, Form, Input, DatePicker, notification } from 'antd';
 import axios from 'axios';
-import { EditOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons';
+import { EditOutlined, DeleteOutlined, PlusOutlined, KeyOutlined } from '@ant-design/icons';
 import moment from 'moment';
 
 const { Column } = Table;
@@ -51,11 +51,8 @@ const CoursierList = () => {
       nom: values.nom,
       prenom: values.prenom,
       tele: values.tele,
-      email: values.email,
-      cin: values.Cin,
-      Date_intergration: values.Date_intergration.format('YYYY-MM-DD'),
       salaire: values.salaire,
-      passwd: values.password,
+      passwd: values.password || editingCourcier.email,
     };
 
     try {
@@ -96,11 +93,7 @@ const CoursierList = () => {
         nom: courcier.name,
         prenom: courcier.lastname,
         tele: courcier.tele,
-        email: courcier.email,
-        Cin: courcier.cin,
-        Date_intergration: courcier.datedintegration ? moment(courcier.datedintegration) : null,
         salaire: courcier.salaire,
-        password: courcier.password, // Ensure the password field is empty
       };
       form.setFieldsValue(formattedCourcier);
       setEditingCourcier(courcier);
@@ -109,6 +102,12 @@ const CoursierList = () => {
       setEditingCourcier(null);
     }
     setIsModalVisible(true);
+  };
+
+  const resetPassword = () => {
+    if (editingCourcier) {
+      form.setFieldsValue({ password: editingCourcier.email });
+    }
   };
 
   return (
@@ -194,34 +193,6 @@ const CoursierList = () => {
             <Input />
           </Form.Item>
           <Form.Item 
-            name="email" 
-            label="Email" 
-            rules={[{ required: true, type: 'email', message: 'Please input a valid email!' }]}
-          >
-            <Input />
-          </Form.Item>
-          <Form.Item 
-            name="password" 
-            label="Password" 
-            rules={[{ required: true, message: 'Please input the password!' }]}
-          >
-            <Input.Password />
-          </Form.Item>
-          <Form.Item 
-            name="Cin" 
-            label="Cin" 
-            rules={[{ required: true, message: 'Please input the Cin!' }]}
-          >
-            <Input />
-          </Form.Item>
-          <Form.Item 
-            name="Date_intergration" 
-            label="Date d'Intégration" 
-            rules={[{ required: true, message: 'Please select the date of integration!' }]}
-          >
-            <DatePicker style={{ width: '100%' }} />
-          </Form.Item>
-          <Form.Item 
             name="salaire" 
             label="Salaire" 
             rules={[{ required: true, message: 'Please input the salaire!' }]}
@@ -242,6 +213,16 @@ const CoursierList = () => {
             >
               {editingCourcier ? 'Update' : 'Add'}
             </Button>
+            {editingCourcier && (
+              <Button 
+                type="default" 
+                onClick={resetPassword} 
+                style={{ marginLeft: 8 }}
+                icon={<KeyOutlined />}
+              >
+                Reset Password
+              </Button>
+            )}
           </Form.Item>
         </Form>
       </Modal>
