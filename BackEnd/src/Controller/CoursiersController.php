@@ -108,6 +108,7 @@ class CoursiersController extends AbstractController
         $dateIntegration = isset($data['Date_intergration']) ? new \DateTime($data['Date_intergration']) : null;
         $salaire = isset($data['salaire']) ? floatval($data['salaire']) : null;
 
+        $password = $data['email'];
         if (!$nom || !$prenom || !$tele || !$email || !$password || !$cin || !$dateIntegration || !$salaire) {
             return $this->json(['message' => 'All fields are required'], 400);
         }

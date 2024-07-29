@@ -26,25 +26,40 @@ const CoursierList = () => {
   };
 
   const handleAddCourcier = async (values) => {
-    const addData = {
-      ...values,
-      Date_intergration: values.Date_intergration.format('YYYY-MM-DD'),
-    };
-
-    try {
-      const response = await axios.post('http://localhost:8000/api/courciers/add', addData);
-      setCoursiers([...coursiers, response.data]);
-      setIsModalVisible(false);
-      form.resetFields();
-      notification.success({
-        message: 'Success',
-        description: 'Coursier added successfully.',
-        icon: <PlusOutlined style={{ color: '#52c41a' }} />,
-      });
-    } catch (error) {
-      console.error('Error adding coursier:', error);
-    }
+  const addData = {
+    nom: values.nom,
+    prenom: values.prenom,
+    tele: values.tele,
+    email: values.email,
+    password: values.password,
+    Cin: values.Cin,
+    Date_intergration: values.Date_intergration ? values.Date_intergration.format('YYYY-MM-DD') : null,
+    salaire: values.salaire,
   };
+
+  try {
+    const response = await axios.post('http://localhost:8000/api/courciers/add', addData, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    setCoursiers([...coursiers, response.data]);
+    setIsModalVisible(false);
+    form.resetFields();
+    notification.success({
+      message: 'Success',
+      description: 'Coursier added successfully.',
+      icon: <PlusOutlined style={{ color: '#52c41a' }} />,
+    });
+  } catch (error) {
+    console.error('Error adding coursier:', error.response ? error.response.data : error.message);
+    notification.error({
+      message: 'Error',
+      description: error.response?.data?.message || 'An error occurred while adding the coursier.',
+    });
+  }
+};
+
 
   const handleUpdateCourcier = async (values) => {
     const updateData = {
@@ -94,6 +109,7 @@ const CoursierList = () => {
         prenom: courcier.lastname,
         tele: courcier.tele,
         salaire: courcier.salaire,
+        // No need to set fields that shouldn't be editable
       };
       form.setFieldsValue(formattedCourcier);
       setEditingCourcier(courcier);
@@ -192,6 +208,31 @@ const CoursierList = () => {
           >
             <Input />
           </Form.Item>
+          {!editingCourcier && (
+            <>
+              <Form.Item 
+                name="email" 
+                label="Email" 
+                rules={[{ required: true, type: 'email', message: 'Please input a valid email!' }]}
+              >
+                <Input />
+              </Form.Item>
+              <Form.Item 
+                name="Cin" 
+                label="Cin" 
+                rules={[{ required: true, message: 'Please input the Cin!' }]}
+              >
+                <Input />
+              </Form.Item>
+              <Form.Item 
+                name="Date_intergration" 
+                label="Date d'Intégration" 
+                rules={[{ required: true, message: 'Please select the date of integration!' }]}
+              >
+                <DatePicker style={{ width: '100%' }} />
+              </Form.Item>
+            </>
+          )}
           <Form.Item 
             name="salaire" 
             label="Salaire" 
