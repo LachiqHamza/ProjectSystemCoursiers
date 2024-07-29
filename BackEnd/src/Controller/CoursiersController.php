@@ -172,6 +172,7 @@ class CoursiersController extends AbstractController
                 'cin' => $courcier->getCin(),
                 'datedintegration' => $courcier->getDateIntergration(),
                 'salaire' => $courcier->getSalaire(),
+                'password' => $courcier->getPassword()
                 //'demandes' => $courcier->getDemandes()
             ];
         }

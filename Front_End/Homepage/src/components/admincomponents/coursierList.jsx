@@ -55,7 +55,7 @@ const CoursierList = () => {
       cin: values.Cin,
       Date_intergration: values.Date_intergration.format('YYYY-MM-DD'),
       salaire: values.salaire,
-      password: values.password,
+      passwd: values.password,
     };
 
     try {
@@ -100,7 +100,7 @@ const CoursierList = () => {
         Cin: courcier.cin,
         Date_intergration: courcier.datedintegration ? moment(courcier.datedintegration) : null,
         salaire: courcier.salaire,
-        password: '', // Ensure the password field is empty
+        password: courcier.password, // Ensure the password field is empty
       };
       form.setFieldsValue(formattedCourcier);
       setEditingCourcier(courcier);
