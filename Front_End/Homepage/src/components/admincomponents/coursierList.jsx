@@ -48,8 +48,8 @@ const CoursierList = () => {
 
   const handleUpdateCourcier = async (values) => {
     const updateData = {
-      nom: values.nom,
-      prenom: values.prenom,
+      nom: values.name,
+      prenom: values.lastname,
       tele: values.tele,
       salaire: values.salaire,
       passwd: values.password,

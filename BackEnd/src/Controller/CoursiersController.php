@@ -137,13 +137,13 @@ class CoursiersController extends AbstractController
         // Return the new courcier data
         $courcierData = [
             'id' => $courcier->getIdCoursier(),
-            'nom' => $courcier->getNom(),
-            'prenom' => $courcier->getPrenom(),
+            'name' => $courcier->getNom(),
+            'lastname' => $courcier->getPrenom(),
             'tele' => $courcier->getTele(),
             'email' => $courcier->getEmail(),
             'role' => $courcier->getRole(),
-            'Cin' => $courcier->getCin(),
-            'Date_intergration' => $courcier->getDateIntergration()->format('Y-m-d'),
+            'cin' => $courcier->getCin(),
+            'datedintegration' => $courcier->getDateIntergration()->format('Y-m-d'),
             'salaire' => $courcier->getSalaire(),
             'demandes' => $courcier->getDemandes()
         ];
