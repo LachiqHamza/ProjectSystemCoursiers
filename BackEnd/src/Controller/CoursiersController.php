@@ -22,17 +22,7 @@ class CoursiersController extends AbstractController
         return $this->json($coursiers);
     }
 
-    #[Route('/api/coursiers/{id}', name: 'get_coursier', methods: ['GET'])]
-    public function getCoursier(CoursiersRepository $coursiersRepository, int $id): JsonResponse
-    {
-        $coursier = $coursiersRepository->find($id);
 
-        if (!$coursier) {
-            return $this->json(['message' => 'Coursier not found'], 404);
-        }
-
-        return $this->json($coursier);
-    }
 
     #[Route('/api/coursiers', name: 'create_coursier', methods: ['POST'])]
     public function createCoursier(Request $request, EntityManagerInterface $entityManager, SerializerInterface $serializer): JsonResponse
@@ -91,7 +81,17 @@ class CoursiersController extends AbstractController
         return $this->json(['message' => 'Coursier deleted']);
     }
 
+    #[Route('/api/coursiers/{id}', name: 'get_coursier', methods: ['GET'])]
+    public function getCoursier(CoursiersRepository $coursiersRepository, int $id): JsonResponse
+    {
+        $coursier = $coursiersRepository->find($id);
 
+        if (!$coursier) {
+            return $this->json(['message' => 'Coursier not found'], 404);
+        }
+
+        return $this->json($coursier);
+    }
 //*******************************************************************
     #[Route('/api/courciers/add', name: 'add_courcier', methods: ['POST'])]
     public function addCourcier(Request $request, ClientRepository $clientRepository, AdminRepository $adminRepository, CoursiersRepository $courcierRepository, EntityManagerInterface $entityManager): JsonResponse
