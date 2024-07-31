@@ -1,19 +1,22 @@
 import React from 'react';
 import { Layout, Menu } from 'antd';
 import { UserOutlined, LogoutOutlined, AppstoreOutlined } from '@ant-design/icons';
-import { useNavigate } from 'react-router-dom'; // Updated from useHistory to useNavigate
+import { useNavigate } from 'react-router-dom';
 
 const { Sider } = Layout;
 
-const Sidebar = () => {
-  const navigate = useNavigate(); // Updated to useNavigate
+const Sidebar = ({ setActiveContent }) => {
+  const navigate = useNavigate();
 
   const handleMenuClick = (e) => {
     if (e.key === 'logout') {
-      // Add your logout logic here
-      console.log('Logout clicked');
+      // Clear local storage tokens
+      localStorage.removeItem('token');
+      localStorage.removeItem('clientId');
+      // Navigate to the homepage
+      navigate('/');
     } else {
-      navigate(e.key); // Updated for navigate
+      setActiveContent(e.key);
     }
   };
 

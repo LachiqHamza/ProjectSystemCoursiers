@@ -1,25 +1,34 @@
-import React from 'react';
-import { Routes, Route } from 'react-router-dom';
+import React, { useState } from 'react';
 import { Layout } from 'antd';
-import Sidebar from './sidebar'; // Adjust path if necessary
-import CrudCoursier from './Coursier'; // Adjust path if necessary
-import GestionDemande from './Demande'; // Adjust path if necessary
+import Sidebar from './sidebar'; 
+import AdminComponent from './Demande';
+import CrudCoursier from './Coursier';
+import App from '../../App';
 
 const { Header, Content } = Layout;
 
 const AdminPage = () => {
+  const [activeContent, setActiveContent] = useState('crud-coursier');
+
+  const renderContent = () => {
+    switch (activeContent) {
+      case 'crud-coursier':
+        return <CrudCoursier />;
+      case 'gestion-demande':
+        return <AdminComponent />;
+      default:
+        return <App />;
+    }
+  };
+
   return (
     <Layout style={{ minHeight: '100vh' }}>
-      <Sidebar />
-      <Layout style={{ marginLeft: 200 }}> {/* Adjust margin for Sidebar */}
+      <Sidebar setActiveContent={setActiveContent} />
+      <Layout style={{ marginLeft: 200 }}>
         <Header className="site-layout-background" style={{ padding: 0 }} />
         <Content style={{ margin: '24px 16px 0' }}>
           <div className="site-layout-background" style={{ padding: 24, minHeight: 360 }}>
-            <Routes>
-              <Route path="crud-coursier" element={<CrudCoursier />} />
-              <Route path="gestion-demande" element={<GestionDemande />} />
-              <Route path="/" element={<CrudCoursier />} />
-            </Routes>
+            {renderContent()}
           </div>
         </Content>
       </Layout>

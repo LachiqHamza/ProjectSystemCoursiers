@@ -37,7 +37,7 @@ const App = () => {
   return (
     <Router>
       <div>
-        <NavigationWrapper /> {/* Navigation logic moved to NavigationWrapper */}
+        <NavigationWrapper /> 
         <Routes>
           <Route
             path="/"
