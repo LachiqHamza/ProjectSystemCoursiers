@@ -89,6 +89,7 @@ class DemandeRepository extends ServiceEntityRepository
         return $this->createQueryBuilder('d')
             ->where('d.admin IS NULL')
             ->andWhere('d.coursier IS NULL')
+            ->andWhere('d.status IS NULL')
             ->getQuery()
             ->getResult();
     }
@@ -119,6 +120,22 @@ class DemandeRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
+//********************************************************************************************************
+
+//********************************************************************************************************
+    public function updateDemandeStatus(int $demandeID, string $status): void
+    {
+        $this->createQueryBuilder('d')
+            ->update()
+            ->set('d.status', ':status')
+            ->where('d.id_demande = :demandeID')
+            ->setParameter('status', $status)
+            ->setParameter('demandeID', $demandeID)
+            ->getQuery()
+            ->execute();
+    }
+
 
 //********************************************************************************************************
 

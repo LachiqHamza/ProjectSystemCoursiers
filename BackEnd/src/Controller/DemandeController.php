@@ -337,4 +337,23 @@ class DemandeController extends AbstractController
     }
 
 //*******************************************************************************************************
+
+
+//*******************************************************************************************************
+    #[Route('/updatedemandestatus/{id}/{status}', name: 'update_demande_status', methods: ['PUT'])]
+    public function updateDemandeStatus(int $id, string $status, DemandeRepository $demandeRepository): JsonResponse
+    {
+        if (!$status) {
+            return $this->json(['error' => 'Status is required'], Response::HTTP_BAD_REQUEST);
+        }
+
+        try {
+            $demandeRepository->updateDemandeStatus($id, $status);
+
+            return $this->json(['message' => 'Status updated successfully']);
+        } catch (\Exception $e) {
+            return $this->json(['error' => $e->getMessage()], Response::HTTP_BAD_REQUEST);
+        }
+    }
+//*******************************************************************************************************
 }
