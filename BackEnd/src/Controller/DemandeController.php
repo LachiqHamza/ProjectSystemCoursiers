@@ -268,7 +268,7 @@ class DemandeController extends AbstractController
 
 
 //*******************************************************************************************************
-    #[Route('/finddemandes/newdemandes/count', name: 'demandes_null_admin_coursier_count', methods: ['GET'])]
+    #[Route('/finddemandes/newdemandes/count', name: 'demandes_count', methods: ['GET'])]
     public function countDemandesWithNullAdminAndCoursier(DemandeRepository $demandeRepository): JsonResponse
     {
         try {
