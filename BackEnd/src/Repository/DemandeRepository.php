@@ -104,6 +104,7 @@ class DemandeRepository extends ServiceEntityRepository
             ->select('COUNT(d.id_demande)')
             ->where('d.admin IS NULL')
             ->andWhere('d.coursier IS NULL')
+            ->andWhere('d.status IS NULL')
             ->getQuery();
 
         return (int) $query->getSingleScalarResult();

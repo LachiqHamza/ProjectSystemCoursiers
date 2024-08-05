@@ -170,7 +170,7 @@ class DemandeController extends AbstractController
             $admin = $demande->getAdmin();
             if ($admin !== null) {
                 $demandeData['admin'] = [
-                    'id_admin' => $admin->getAdmin(),
+                    'id_admin' => $admin->getIdAdmin(),
                     'admin_name' => $admin->getNom(),
                     'admin_prenom' => $admin->getPrenom(),
                     'admin_telephone' => $admin->getTele(),
