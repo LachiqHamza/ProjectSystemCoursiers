@@ -340,20 +340,32 @@ class DemandeController extends AbstractController
 
 
 //*******************************************************************************************************
-    #[Route('/updatedemandestatus/{id}/{status}', name: 'update_demande_status', methods: ['PUT'])]
-    public function updateDemandeStatus(int $id, string $status, DemandeRepository $demandeRepository): JsonResponse
+    #[Route('/updatedemandestatus/{id}', name: 'update_demande_status', methods: ['PUT'])]
+    public function updateDemandeStatus(int $id, Request $request, DemandeRepository $demandeRepository): JsonResponse
     {
-        if (!$status) {
+        // Decode the JSON request body
+        $data = json_decode($request->getContent(), true);
+
+        // Extract status, admin_id, and coursier_id from the request body
+        $status = $data['status'] ?? null;
+        $adminID = $data['admin_id'] ?? null;
+        $coursierID = $data['coursier_id'] ?? null;
+
+        // Validate the required fields
+        if ($status === null) {
             return $this->json(['error' => 'Status is required'], Response::HTTP_BAD_REQUEST);
         }
 
         try {
-            $demandeRepository->updateDemandeStatus($id, $status);
+            // Call the repository method to update the demande status and other details
+            $demandeRepository->updateDemandeStatus($id, $adminID, $coursierID, $status);
 
-            return $this->json(['message' => 'Status updated successfully']);
+            return $this->json(['message' => 'Demande updated successfully']);
         } catch (\Exception $e) {
             return $this->json(['error' => $e->getMessage()], Response::HTTP_BAD_REQUEST);
         }
     }
+
+
 //*******************************************************************************************************
 }

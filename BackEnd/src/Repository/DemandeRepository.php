@@ -3,6 +3,8 @@
 namespace App\Repository;
 
 use App\Entity\Demande;
+use App\Entity\Admin;
+use App\Entity\Coursiers;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use PhpParser\Node\Scalar\String_;
@@ -125,18 +127,51 @@ class DemandeRepository extends ServiceEntityRepository
 //********************************************************************************************************
 
 //********************************************************************************************************
-    public function updateDemandeStatus(int $demandeID, string $status): void
+    public function updateDemandeStatus(int $demandeID, ?int $adminID, ?int $coursierID, string $status): void
     {
-        $this->createQueryBuilder('d')
+        $entityManager = $this->getEntityManager();
+        $qb = $this->createQueryBuilder('d')
             ->update()
             ->set('d.status', ':status')
-            ->where('d.id_demande = :demandeID')
             ->setParameter('status', $status)
-            ->setParameter('demandeID', $demandeID)
-            ->getQuery()
-            ->execute();
+            ->where('d.id_demande = :demandeID')
+            ->setParameter('demandeID', $demandeID);
+
+        // Check if the Admin entity exists and set it
+        if ($adminID !== null) {
+            $admin = $entityManager->getRepository(Admin::class)->find($adminID);
+            if (!$admin) {
+                throw new \Exception('Admin with ID ' . $adminID . ' does not exist.');
+            }
+            $qb->set('d.admin', ':admin')
+                ->setParameter('admin', $admin);
+        } else {
+            $qb->set('d.admin', ':admin')
+                ->setParameter('admin', null);
+        }
+
+        // Check if the Coursiers entity exists and set it
+        if ($coursierID !== null) {
+            $coursier = $entityManager->getRepository(Coursiers::class)->find($coursierID);
+            if (!$coursier) {
+                throw new \Exception('Coursier with ID ' . $coursierID . ' does not exist.');
+            }
+            $qb->set('d.coursier', ':coursier')
+                ->setParameter('coursier', $coursier);
+        } else {
+            $qb->set('d.coursier', ':coursier')
+                ->setParameter('coursier', null);
+        }
+
+        $qb->getQuery()->execute();
     }
 
+
+
+
+//********************************************************************************************************
+
+//********************************************************************************************************
 
 //********************************************************************************************************
 
