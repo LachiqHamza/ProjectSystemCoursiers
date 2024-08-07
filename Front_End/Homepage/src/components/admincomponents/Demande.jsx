@@ -7,6 +7,7 @@ const { Content } = Layout;
 const AdminComponent = () => {
   const [demandes, setDemandes] = useState([]);
   const [coursierEmails, setCoursierEmails] = useState([]);
+  const [newDemandesCount, setNewDemandesCount] = useState(0);
 
   const fetchDemandes = async () => {
     try {
@@ -26,9 +27,19 @@ const AdminComponent = () => {
     }
   };
 
+  const fetchNewDemandesCount = async () => {
+    try {
+      const response = await axios.get('http://127.0.0.1:8000/api/demandes/finddemandes/newdemandes/count');
+      setNewDemandesCount(response.data.count);
+    } catch (error) {
+      message.error('Failed to fetch new demandes count.');
+    }
+  };
+
   useEffect(() => {
     fetchDemandes();
     fetchCoursierEmails();
+    fetchNewDemandesCount();
   }, []);
 
   const handleStatusChange = (id, value) => {
@@ -55,6 +66,7 @@ const AdminComponent = () => {
       });
       message.success('Demande updated successfully.');
       await fetchDemandes();
+      await fetchNewDemandesCount(); // Update the count after updating a demande
     } catch (error) {
       message.error('Failed to update demande.');
     }
@@ -116,6 +128,7 @@ const AdminComponent = () => {
       <Content style={{ margin: '24px 16px 0', overflow: 'initial' }}>
         <div style={{ padding: 24, background: '#fff', minHeight: '100vh' }}>
           <h1>Gestion Demande</h1>
+          <p style={{ fontWeight: 'bold' }}>Number of new demandes: {newDemandesCount}</p>
           <Table dataSource={demandes} columns={columns} rowKey="id_demande" />
         </div>
       </Content>
