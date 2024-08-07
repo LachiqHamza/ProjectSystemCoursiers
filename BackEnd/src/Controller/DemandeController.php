@@ -7,7 +7,9 @@ use App\Entity\Client;
 use App\Entity\Admin;
 use App\Entity\Coursiers;
 use App\Repository\DemandeRepository;
+use App\Repository\CoursiersRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use phpDocumentor\Reflection\Types\String_;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -341,7 +343,7 @@ class DemandeController extends AbstractController
 
 //*******************************************************************************************************
     #[Route('/updatedemandestatus/{id}', name: 'update_demande_status', methods: ['PUT'])]
-    public function updateDemandeStatus(int $id, Request $request, DemandeRepository $demandeRepository): JsonResponse
+    public function updateDemandeStatus(int $id, Request $request, DemandeRepository $demandeRepository, CoursiersRepository $coursiersRepository): JsonResponse
     {
         // Decode the JSON request body
         $data = json_decode($request->getContent(), true);
@@ -349,7 +351,19 @@ class DemandeController extends AbstractController
         // Extract status, admin_id, and coursier_id from the request body
         $status = $data['status'] ?? null;
         $adminID = $data['admin_id'] ?? null;
-        $coursierID = $data['coursier_id'] ?? null;
+        //$coursierID = $data['coursier_id'] ?? null;
+        $coursierEmail = $data['coursier_email'] ?? null;
+
+        if($coursierEmail){
+            $coursier = $coursiersRepository->findOneBy(['email' => $coursierEmail]);
+            if ($coursier) {
+                $coursierID = $coursier->getIdCoursier();
+            } else {
+                $coursierID = null;
+            }
+        }else {
+            $coursierID = null;
+        }
 
         // Validate the required fields
         if ($status === null) {
