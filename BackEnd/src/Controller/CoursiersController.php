@@ -253,4 +253,20 @@ class CoursiersController extends AbstractController
     }
 //*******************************************************************
 
+//*******************************************************************
+    #[Route('/api/courciers/all/emails', name: 'get_all_courciers_emails', methods: ['GET'])]
+    public function getAllCourciersEmails(CoursiersRepository $coursiersRepository): JsonResponse
+    {
+        $courciers = $coursiersRepository->findAll();
+
+        $courciersEmails = [];
+        foreach ($courciers as $courcier) {
+            $courciersEmails[] = $courcier->getEmail();
+        }
+
+        return $this->json($courciersEmails);
+    }
+
+//*******************************************************************
+
 }
