@@ -6,7 +6,7 @@ const { Content } = Layout;
 
 const AdminComponent = () => {
   const [demandes, setDemandes] = useState([]);
-  const [coursiers, setCoursiers] = useState([]);
+  const [coursierEmails, setCoursierEmails] = useState([]);
 
   const fetchDemandes = async () => {
     try {
@@ -17,10 +17,10 @@ const AdminComponent = () => {
     }
   };
 
-  const fetchCoursiers = async () => {
+  const fetchCoursierEmails = async () => {
     try {
-      const response = await axios.get('http://127.0.0.1:8000/api/courciers/all');
-      setCoursiers(response.data);
+      const response = await axios.get('http://127.0.0.1:8000/api/courciers/all/emails');
+      setCoursierEmails(response.data);
     } catch (error) {
       message.error('Failed to fetch coursiers.');
     }
@@ -28,19 +28,19 @@ const AdminComponent = () => {
 
   useEffect(() => {
     fetchDemandes();
-    fetchCoursiers();
+    fetchCoursierEmails();
   }, []);
 
   const handleStatusChange = (id, value) => {
     const updatedDemandes = demandes.map((demande) =>
-      demande.id_demande === id ? { ...demande, status: value } : demande
+      demande.id_demande === id ? { ...demande, status: value, coursier_email: value === 'refuser' ? null : demande.coursier_email } : demande
     );
     setDemandes(updatedDemandes);
   };
 
-  const handleCoursierChange = (id, value) => {
+  const handleCoursierEmailChange = (id, value) => {
     const updatedDemandes = demandes.map((demande) =>
-      demande.id_demande === id ? { ...demande, id_coursier: value } : demande
+      demande.id_demande === id ? { ...demande, coursier_email: value } : demande
     );
     setDemandes(updatedDemandes);
   };
@@ -48,9 +48,10 @@ const AdminComponent = () => {
   const handleUpdate = async (demande) => {
     const adminId = localStorage.getItem('clientId');
     try {
-      await axios.put(`http://localhost:8000/api/demandes/${demande.id_demande}`, {
-        ...demande,
-        id_admin: adminId,
+      await axios.put(`http://127.0.0.1:8000/api/demandes/updatedemandestatus/${demande.id_demande}`, {
+        status: demande.status,
+        admin_id: adminId,
+        coursier_email: demande.status === 'accepter' ? demande.coursier_email : null,
       });
       message.success('Demande updated successfully.');
       await fetchDemandes();
@@ -73,25 +74,27 @@ const AdminComponent = () => {
         <Select
           value={record.status}
           onChange={(value) => handleStatusChange(record.id_demande, value)}
+          style={{ width: 150 }}
         >
-          <Select.Option value="pending">Pending</Select.Option>
-          <Select.Option value="in-progress">In Progress</Select.Option>
-          <Select.Option value="completed">Completed</Select.Option>
+          <Select.Option value="accepter">Accepter</Select.Option>
+          <Select.Option value="refuser">Refuser</Select.Option>
         </Select>
       ),
     },
     {
-      title: 'Coursier',
-      dataIndex: 'id_coursier',
-      key: 'id_coursier',
+      title: 'Coursier Email',
+      dataIndex: 'coursier_email',
+      key: 'coursier_email',
       render: (text, record) => (
         <Select
-          value={record.id_coursier}
-          onChange={(value) => handleCoursierChange(record.id_demande, value)}
+          value={record.coursier_email}
+          onChange={(value) => handleCoursierEmailChange(record.id_demande, value)}
+          disabled={record.status === 'refuser'}
+          style={{ width: 250 }} // Adjust the width as needed
         >
-          {coursiers.map((coursier) => (
-            <Select.Option key={coursier.id_coursier} value={coursier.id_coursier}>
-              {coursier.nom} {coursier.prenom}
+          {coursierEmails.map((email) => (
+            <Select.Option key={email} value={email}>
+              {email}
             </Select.Option>
           ))}
         </Select>
