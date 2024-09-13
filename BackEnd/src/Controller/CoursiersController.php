@@ -22,6 +22,30 @@ class CoursiersController extends AbstractController
         return $this->json($coursiers);
     }
 
+    #[Route('/api/coursiers/{id}', name: 'get_coursier_by_id', methods: ['GET'])]
+    public function getCoursierByID(int $id, CoursiersRepository $coursiersRepository): JsonResponse
+    {
+        $coursier = $coursiersRepository->find($id);
+        if (!$coursier) {
+            return $this->json(['message' => 'Coursier not found'], JsonResponse::HTTP_NOT_FOUND);
+        }
+
+        $coursierData = [
+            'id' => $coursier->getIdCoursier(),
+            'name' => $coursier->getNom(),
+            'lastname' => $coursier->getPrenom(),
+            'email' => $coursier->getEmail(),
+            'role' => $coursier->getRole(),
+            'tele' => $coursier->getTele(),
+            'cin' => $coursier->getCin(),
+            'datedintegration' => $coursier->getDateIntergration(),
+            'salaire' => $coursier->getSalaire(),
+            'password' => $coursier->getPassword(),
+            // 'demandes' => $coursier->getDemandes(), // Uncomment this if you want to include demandes
+        ];
+
+        return $this->json($coursierData);
+    }
 
 
     #[Route('/api/coursiers', name: 'create_coursier', methods: ['POST'])]

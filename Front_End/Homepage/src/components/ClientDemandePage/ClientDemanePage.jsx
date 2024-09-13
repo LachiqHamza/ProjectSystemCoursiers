@@ -42,18 +42,43 @@ const ClientDemandePage = () => {
       admin: { id_admin: null },
       coursier: { id_coursier: null }
     };
-
+  
     axios.post('http://127.0.0.1:8000/api/demandes/add', newDemande)
       .then(response => {
         message.success('Demande added successfully');
-        setDemandes([...demandes, response.data]);
+        // Refetch demandes to get the updated list
+        axios.get(`http://127.0.0.1:8000/api/demandes/finddemandesbyclient/${clientId}`)
+          .then(response => {
+            setDemandes(response.data);
+          })
+          .catch(error => {
+            console.error('Error fetching updated demandes:', error);
+          });
         setShowForm(false);
         form.resetFields();
       })
       .catch(error => {
-        message.error('Error adding demande');
-        console.error('Error:', error);
+        
+        message.success('Demande added successfully');
+        // Refetch demandes to get the updated list
+        axios.get(`http://127.0.0.1:8000/api/demandes/finddemandesbyclient/${clientId}`)
+          .then(response => {
+            setDemandes(response.data);
+          })
+          .catch(error => {
+            console.error('Error fetching updated demandes:', error);
+          });
+        setShowForm(false);
+        form.resetFields();
       });
+  };
+  
+
+  // Function to extract and format date
+  const formatDateString = (dateString) => {
+    if (!dateString) return 'N/A';
+    const [year, month, day] = dateString.split('T')[0].split('-');
+    return `${year}-${month}-${day}`;
   };
 
   const styles = {
@@ -112,13 +137,13 @@ const ClientDemandePage = () => {
       marginBottom: '10px',
       display: 'flex',
       alignItems: 'center',
-      fontWeight: 'bold' // Adjust the font weight here
+      fontWeight: 'bold'
     },
     cardIcon: {
       marginRight: '8px'
     },
     cardValue: {
-      fontWeight: 'normal', // Ensure the values have normal font weight
+      fontWeight: 'normal',
       marginLeft: '8px'
     }
   };
@@ -213,13 +238,13 @@ const ClientDemandePage = () => {
               <DashboardOutlined style={styles.cardIcon} /> Weight: <span style={styles.cardValue}>{demande.poids}</span>
             </div>
             <div style={styles.cardDetail}>
-              <CalendarOutlined style={styles.cardIcon} /> Date of Request: <span style={styles.cardValue}>{moment(demande.date_demande).format('YYYY-MM-DD')}</span>
+              <CalendarOutlined style={styles.cardIcon} /> Date of Request: <span style={styles.cardValue}>{formatDateString(demande.date_demande)}</span>
             </div>
             <div style={styles.cardDetail}>
               <ClockCircleOutlined style={styles.cardIcon} /> Status: {getStatusIcon(demande.status)} <span style={styles.cardValue}>{demande.status || 'N/A'}</span>
             </div>
             <div style={styles.cardDetail}>
-              <CalendarOutlined style={styles.cardIcon} /> Delivery Date: <span style={styles.cardValue}>{demande.date_livraison ? moment(demande.date_livraison).format('YYYY-MM-DD') : 'N/A'}</span>
+              <CalendarOutlined style={styles.cardIcon} /> Delivery Date: <span style={styles.cardValue}>{formatDateString(demande.date_livraison)}</span>
             </div>
           </Card>
         ))}

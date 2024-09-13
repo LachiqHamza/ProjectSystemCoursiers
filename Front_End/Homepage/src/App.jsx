@@ -15,6 +15,7 @@ import ErrorPage from "./components/LogingAndSignup/errorpage";
 import LoginFormWrapper from "./components/LogingAndSignup/loginformWrapper";
 import AdminPage from "./components/admincomponents/adminPage";
 import ClientDemandePage from "./components/ClientDemandePage/ClientDemanePage";
+import CoursierPage from "./components/coursiercomponents/coursierPage";
 
 export const scroll = new SmoothScroll('a[href*="#"]', {
   speed: 1000,
@@ -58,6 +59,7 @@ const App = () => {
           <Route path="/error" element={<ErrorPage />} />
           <Route path="/admin/*" element={<AdminPage />} />
           <Route path="/client" element={<ClientDemandePage />} />
+          <Route path="/coursier-dashboard" element={<CoursierPage />} />
         </Routes>
       </div>
     </Router>

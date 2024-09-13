@@ -214,7 +214,8 @@ class DemandeController extends AbstractController
     public function updateDateLivraison(int $id_demande, string $date, DemandeRepository $demandeRepository): JsonResponse
     {
         try {
-            $dateLivraison = \DateTime::createFromFormat('Y-m-d', $date);
+            // Parse the date in UTC
+            $dateLivraison = \DateTime::createFromFormat('Y-m-d', $date, new \DateTimeZone('UTC'));
 
             if (!$dateLivraison) {
                 throw new \Exception('Invalid date format. Expected Y-m-d.');
@@ -227,6 +228,9 @@ class DemandeController extends AbstractController
             return $this->json(['error' => $e->getMessage()], Response::HTTP_BAD_REQUEST);
         }
     }
+
+
+
 
 //*******************************************************************************************************
 
